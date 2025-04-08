@@ -41,7 +41,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @param userAccount   用户账户
      * @param userPassword  用户密码
      * @param checkPassword 校验密码
-     * @return 新用户 id
+     * @return
+     * success: 新用户id
+     * error:
+     *      {-2: "账户不是由字母、数字和下划线组成",
+     *       -1: "密码和校验密码不相同"，
+     *       -3: "数据存入失败"}
      */
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -52,7 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userAccount.length() < 4) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
         }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
+        if (userPassword.length() < 6 || checkPassword.length() < 6) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
         }
 
@@ -60,9 +65,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String validPattern = "^[a-zA-Z0-9_]+$";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (!matcher.matches()) {
-            return -1;
+            return -2;
         }
-        // 密码和校验密码相同
+        // 密码和校验密码不相同
         if (!userPassword.equals(checkPassword)) {
             return -1;
         }
@@ -82,10 +87,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserPassword(encryptPassword);
         user.setUsername("编程侠");    // 默认用户名，与用户账户不一样
         user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像（宝贝的玄凤）
+        user.setGender(0);   // 0 代表未知， 1 代表男， 2代表女， 3代表中性
 
         boolean saveResult = this.save(user);
         if (!saveResult) {
-            return -1;
+            return -3;
         }
         return user.getId();
     }
@@ -152,7 +158,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUserAccount(originUser.getUserAccount());
         safetyUser.setAvatarUrl(originUser.getAvatarUrl());
         safetyUser.setGender(originUser.getGender());
-        safetyUser.setPhone(originUser.getPhone());
         safetyUser.setEmail(originUser.getEmail());
         safetyUser.setUserRole(originUser.getUserRole());
         safetyUser.setUserStatus(originUser.getUserStatus());

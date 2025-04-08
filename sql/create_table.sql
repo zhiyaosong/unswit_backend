@@ -6,27 +6,37 @@ create database if not exists user_centre;
 -- 切换库
 use user_centre;
 
+# 如果用户表已存在,则删除
+drop table if exists user;
+
 # 用户表
 create table user
 (
     username     varchar(256)                       null comment '用户昵称',
-    id           bigint auto_increment comment 'id'
-        primary key,
+    id           bigint auto_increment comment 'id' primary key,
     userAccount  varchar(256)                       null comment '账号',
     avatarUrl    varchar(1024)                      null comment '用户头像',
     gender       tinyint                            null comment '性别',
-    userPassword varchar(512)                       not null comment '密码',
-    phone        varchar(128)                       null comment '电话',
+    userPassword varchar(512)                       not null comment '密码(MD5 Hash)',
+    admissionTime varchar(16)                       null comment '入学时间（早于24T1，24T1, 24T2, 24T3, 25T1, 25T2, 25T3, 晚于25T3）',
     email        varchar(512)                       null comment '邮箱',
-    userStatus   int      default 0                 not null comment '状态 0 - 正常',
+    selfDescription  TEXT                           null comment '自我描述',
+    userStatus   int      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
     updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     isDelete     tinyint  default 0                 not null comment '是否删除',
-    userRole     int      default 0                 not null comment '用户角色 0 - 普通用户 1 - 管理员',
+    userRole     int      default 0                 not null comment '用户角色 0 - 普通用户 1 - 管理员'
 
 )
     comment '用户';
 
 # 导入示例用户
-INSERT INTO user_centre.user (username, userAccount, gender, userPassword, phone, email, userStatus, createTime, updateTime, isDelete, userRole) VALUES ('阳阳阳', 'yang', null, 'b0dd3697a192885d7c055db46155b26a', null, null, 0, '2023-08-06 14:14:22', '2023-08-06 14:39:37', 0, 1, '1');
+INSERT INTO user_centre.user (
+  username, userAccount, gender, userPassword,avatarUrl,
+  admissionTime, email, selfDescription, userStatus,
+  createTime, updateTime, isDelete, userRole
+) VALUES (
+  '阳阳阳', 'yang', null, '1bbd886460827015e5d605ed44252251','/img/a.png',
+  '24T1', null, '我是一个热爱学习编程的学生。', 0,
+  '2023-08-06 14:14:22', '2023-08-06 14:39:37', 0, 1);
 
