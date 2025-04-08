@@ -80,6 +80,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
+        user.setUsername("编程侠");    // 默认用户名，与用户账户不一样
+        user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像（宝贝的玄凤）
 
         boolean saveResult = this.save(user);
         if (!saveResult) {

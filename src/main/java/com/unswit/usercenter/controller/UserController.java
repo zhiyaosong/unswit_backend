@@ -39,6 +39,7 @@ public class UserController {
     }
     @GetMapping("/list")
     public BaseResponse<List<User>> getUserList(HttpServletRequest request) {
+        System.out.println("收到查询");
         // 仅管理员可查询用户列表
         if (!isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "缺少管理员权限");
