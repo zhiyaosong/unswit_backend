@@ -49,7 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      *       -3: "数据存入失败"}
      */
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public long userRegister(String userName, String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
@@ -85,7 +85,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
-        user.setUsername("编程侠");    // 默认用户名，与用户账户不一样
+        if (StringUtils.isNotBlank(userName)) {
+            user.setUserName(userName);
+        }else {
+            user.setUserName("编程侠");   // 默认用户名，与用户账户不一样
+        }
         user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像（宝贝的玄凤）
         user.setGender(0);   // 0 代表未知， 1 代表男， 2代表女， 3代表中性
 
@@ -113,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userAccount.length() < 4) {
             return null;
         }
-        if (userPassword.length() < 8) {
+        if (userPassword.length() < 6) {
             return null;
         }
         // 账户只能由字母、数字和下划线组成
@@ -124,6 +128,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        System.out.println("加密后密码"+encryptPassword);
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
@@ -154,7 +159,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         User safetyUser = new User();
         safetyUser.setId(originUser.getId());
-        safetyUser.setUsername(originUser.getUsername());
+        safetyUser.setUserName(originUser.getUserName());
         safetyUser.setUserAccount(originUser.getUserAccount());
         safetyUser.setAvatarUrl(originUser.getAvatarUrl());
         safetyUser.setGender(originUser.getGender());

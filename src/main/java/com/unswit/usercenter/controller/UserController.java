@@ -65,13 +65,14 @@ public class UserController {
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        String userName = userRegisterRequest.getUserName();
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        long result = userService.userRegister(userName, userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
     }
 
@@ -94,7 +95,8 @@ public class UserController {
         }
         User user = userService.userLogin(userAccount, userPassword, request);
         if (user == null) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"密码错误","密码错误");
+            // 前端弹窗内容是desc内容
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"密码错误msg","密码错误desc");
         }
         return ResultUtils.success(user);
     }

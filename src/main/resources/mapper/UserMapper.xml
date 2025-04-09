@@ -14,7 +14,7 @@
         <result property="userPassword" column="userPassword" jdbcType="VARCHAR"/>
         <result property="admissionTime" column="admissionTime" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
-        <result property="selfDescription" column="selfDescription" jdbcType="TEXT"/>
+        <result property="selfDescription" column="selfDescription" jdbcType="LONGVARCHAR"/>
         <result property="userStatus" column="userStatus" jdbcType="INTEGER"/>
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
