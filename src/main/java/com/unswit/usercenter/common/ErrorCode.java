@@ -13,15 +13,7 @@ public enum ErrorCode {
     SYSTEM_ERROR(50000, "系统内部异常", "");
 
     private final int code;
-
-    /**
-     * 状态码信息
-     */
     private final String message;
-
-    /**
-     * 状态码描述（详情）
-     */
     private final String description;
 
     ErrorCode(int code, String message, String description) {
@@ -38,7 +30,6 @@ public enum ErrorCode {
         return message;
     }
 
-    // https://t.zsxq.com/0emozsIJh
 
     public String getDescription() {
         return description;
