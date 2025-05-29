@@ -136,7 +136,6 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
-
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         if (!isAdmin(request)) {
@@ -162,7 +161,6 @@ public class UserController {
         boolean b = userService.removeById(id);
         return ResultUtils.success(b);
     }
-
 
     /**
      * 是否为管理员
