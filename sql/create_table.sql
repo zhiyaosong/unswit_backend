@@ -40,23 +40,47 @@ INSERT INTO user_centre.user (
   '24T1', null, '我是一个热爱学习编程的学生。', 0,
   '2023-08-06 14:14:22', '2023-08-06 14:39:37', 0, 1);
 
-create table if not exists `notes`
+create table if not exists `course`
 (
     id bigint auto_increment comment 'id' primary key,
     code         varchar(256)                       not null comment '课程码',
     title        varchar(512)                       null comment '课程名',
-    author       varchar(512)                       not null comment '笔记作者',
-    lecturer     varchar(512)                       null comment '任课教师',
-    stream       varchar(256)                       null comment '所属课程体系',
-    selfDescription  TEXT                           null comment '自我描述',
+    category     int      default 0                 not null comment '所属课程体系,0:it,1:ai,2:ds,3:cb,4:ee',
+    toolTip      TEXT                               null comment '标题说明(旁边的!),也可以作为课程描述',
+    runTime      int                                null comment '1,2,3,12,13,23,123,分别代表T1,T2,T3开学',
 
-    noteStatus   int      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
     updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     isDelete     tinyint  default 0                 not null comment '是否删除'
-)comment '笔记';
+)comment '课程';
 
-INSERT INTO user_centre.notes (code, title, author, lecturer, stream, selfDescription
+INSERT INTO user_centre.course (code, title, category, toolTip, runTime
 ) VALUES (
-  '6713','自然语言处理','yang','joshi',
-  'ai','这是一门好课，我也是一个好笔记');
+  '6713','自然语言处理','1','这是一门好课，我也是一个好笔记','123');
+
+drop table if exists notes;
+
+create table if not exists `note`
+(
+      id         bigint auto_increment primary key comment '笔记主键',
+      courseId  bigint              not null comment '所属课程的id',
+      title      varchar(512)        null comment '笔记名',
+      link       varchar(512)        null comment '笔记链接',
+      author     varchar(512)        not null comment '笔记作者',
+      lecturer   varchar(512)        comment '任课教师',
+      toolTip    text                comment '笔记描述',
+
+      noteStatus int default 0       not null comment '状态 0-正常,1-封号',
+      createTime datetime default CURRENT_TIMESTAMP comment '创建时间',
+      updateTime datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP comment '更新时间',
+      isDelete   tinyint default 0   not null comment '是否删除',
+
+      constraint fk_note_course foreign key (courseId) references course(id)
+) comment '笔记';
+
+INSERT INTO user_centre.note (
+        course_id, title, link, author, lecturer, toolTip)
+VALUES ('1','6713笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
+        'yang','joshi','这是yang的6713笔记');
+
+

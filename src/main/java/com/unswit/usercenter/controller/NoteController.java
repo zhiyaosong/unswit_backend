@@ -7,7 +7,6 @@ import com.unswit.usercenter.model.domain.Notes;
 import com.unswit.usercenter.service.NotesService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -25,9 +24,9 @@ public class NoteController {
      * @return
      */
     @GetMapping()
-    public BaseResponse<List<Notes>> getAllnotes() {
+    public BaseResponse<List<Notes>> getAllNotes() {
         List<Notes> notes = notesService.list();
-        if(notes==null){
+        if(notes == null){
             return ResultUtils.error(ErrorCode.NULL_ERROR);
         }
         return ResultUtils.success(notes);
