@@ -7,7 +7,7 @@
 
     <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.User">
         <id property="id" column="id" jdbcType="BIGINT"/>
-        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="userName" column="username" jdbcType="VARCHAR"/>
         <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
         <result property="avatarUrl" column="avatarUrl" jdbcType="VARCHAR"/>
         <result property="gender" column="gender" jdbcType="TINYINT"/>
