@@ -6,6 +6,9 @@ import com.unswit.usercenter.service.NotesService;
 import com.unswit.usercenter.mapper.NotesMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
 * @author zy183
 * @description 针对表【notes(笔记)】的数据库操作Service实现
