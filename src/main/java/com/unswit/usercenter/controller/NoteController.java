@@ -5,9 +5,7 @@ import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.service.NoteService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,8 +18,6 @@ public class NoteController {
 
     /**
      * 查询所有笔记，并以JSON数组形式返回
-     * @param
-     * @return
      */
     @GetMapping()
     public BaseResponse<List<Note>> getAllNote() {
@@ -31,4 +27,9 @@ public class NoteController {
         }
         return ResultUtils.success(note);
     }
+    @PostMapping("add")
+    public ErrorCode addNote(@RequestBody Note note) {
+        return noteService.addNote(note);
+    }
+
 }

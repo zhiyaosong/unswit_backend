@@ -1,5 +1,6 @@
 package com.unswit.usercenter.service;
 
+import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.model.domain.Note;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface NoteService extends IService<Note> {
 
+    ErrorCode addNote(Note note);
 }
