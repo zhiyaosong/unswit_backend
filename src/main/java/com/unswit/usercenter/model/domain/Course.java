@@ -20,7 +20,7 @@ public class Course {
 
     private String toolTip;
 
-    private Integer runTime;
+    private Integer enrollTerm;
 
     private Date createTime;
 
@@ -45,7 +45,7 @@ public class Course {
             && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
             && (this.getCategory() == null ? other.getCategory() == null : this.getCategory().equals(other.getCategory()))
             && (this.getToolTip() == null ? other.getToolTip() == null : this.getToolTip().equals(other.getToolTip()))
-            && (this.getRunTime() == null ? other.getRunTime() == null : this.getRunTime().equals(other.getRunTime()))
+            && (this.getEnrollTerm() == null ? other.getEnrollTerm() == null : this.getEnrollTerm().equals(other.getEnrollTerm()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
             && (this.getIsDelete() == null ? other.getIsDelete() == null : this.getIsDelete().equals(other.getIsDelete()));
@@ -60,7 +60,7 @@ public class Course {
         result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
         result = prime * result + ((getCategory() == null) ? 0 : getCategory().hashCode());
         result = prime * result + ((getToolTip() == null) ? 0 : getToolTip().hashCode());
-        result = prime * result + ((getRunTime() == null) ? 0 : getRunTime().hashCode());
+        result = prime * result + ((getEnrollTerm() == null) ? 0 : getEnrollTerm().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
         result = prime * result + ((getIsDelete() == null) ? 0 : getIsDelete().hashCode());
@@ -78,7 +78,7 @@ public class Course {
         sb.append(", title=").append(title);
         sb.append(", category=").append(category);
         sb.append(", toolTip=").append(toolTip);
-        sb.append(", runTime=").append(runTime);
+        sb.append(", enrollTerm=").append(enrollTerm);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", isDelete=").append(isDelete);

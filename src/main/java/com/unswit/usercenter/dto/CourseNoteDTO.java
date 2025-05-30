@@ -15,7 +15,7 @@ public class CourseNoteDTO {
 
     private String toolTip;
 
-    private Integer runTime;
+    private Integer enrollTerm;
 
     private List<Note> noteList;
 
@@ -59,12 +59,12 @@ public class CourseNoteDTO {
         this.toolTip = toolTip;
     }
 
-    public Integer getRunTime() {
-        return runTime;
+    public Integer getEnrollTerm() {
+        return enrollTerm;
     }
 
-    public void setRunTime(Integer runTime) {
-        this.runTime = runTime;
+    public void setEnrollTerm(Integer enrollTerm) {
+        this.enrollTerm = enrollTerm;
     }
 
     public List<Note> getNoteList() {

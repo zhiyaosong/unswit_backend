@@ -10,14 +10,14 @@
             <result property="title" column="title" />
             <result property="category" column="category" />
             <result property="toolTip" column="toolTip" />
-            <result property="runTime" column="runTime" />
+            <result property="enrollTerm" column="enrollTerm" />
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,code,title,category,toolTip,runTime,
+        id,code,title,category,toolTip,enrollTerm,
         createTime,updateTime,isDelete
     </sql>
 </mapper>

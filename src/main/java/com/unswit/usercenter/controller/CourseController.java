@@ -26,8 +26,6 @@ public class CourseController {
     /**
      * 查询所有课程，并以JSON数组形式返回
      * 尾部拼接每个课程对应的note列表
-     * @param
-     * @return
      */
     @GetMapping()
     public BaseResponse<List<CourseNoteDTO>> getAllCourseNote() {
@@ -37,7 +35,7 @@ public class CourseController {
         List<CourseNoteDTO> courseNoteDTOS = new ArrayList<>(courses.size());
         for(Course course : courses) {
             Long courseId = course.getId();
-            //按照courseid查询笔记
+            //按照course id查询笔记
             List<Note> notes = noteService.list(
                     new QueryWrapper<Note>().eq("courseId", courseId)
             );
@@ -47,7 +45,7 @@ public class CourseController {
             courseNoteDTO.setTitle(course.getTitle());
             courseNoteDTO.setNoteList(notes);
             courseNoteDTO.setCode(course.getCode());
-            courseNoteDTO.setRunTime(course.getRunTime());
+            courseNoteDTO.setEnrollTerm(course.getEnrollTerm());
             courseNoteDTO.setToolTip(course.getToolTip());
             courseNoteDTOS.add(courseNoteDTO);
         }
