@@ -1,8 +1,9 @@
 package com.unswit.usercenter.model.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @TableName note
@@ -25,6 +26,8 @@ public class Note {
     private String toolTip;
 
     private Integer noteStatus;
+
+    private Integer isCheck;
 
     private Date createTime;
 
@@ -52,6 +55,7 @@ public class Note {
             && (this.getLecturer() == null ? other.getLecturer() == null : this.getLecturer().equals(other.getLecturer()))
             && (this.getToolTip() == null ? other.getToolTip() == null : this.getToolTip().equals(other.getToolTip()))
             && (this.getNoteStatus() == null ? other.getNoteStatus() == null : this.getNoteStatus().equals(other.getNoteStatus()))
+            && (this.getIsCheck() == null ? other.getIsCheck() == null : this.getIsCheck().equals(other.getIsCheck()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
             && (this.getIsDelete() == null ? other.getIsDelete() == null : this.getIsDelete().equals(other.getIsDelete()));
@@ -69,6 +73,7 @@ public class Note {
         result = prime * result + ((getLecturer() == null) ? 0 : getLecturer().hashCode());
         result = prime * result + ((getToolTip() == null) ? 0 : getToolTip().hashCode());
         result = prime * result + ((getNoteStatus() == null) ? 0 : getNoteStatus().hashCode());
+        result = prime * result + ((getIsCheck() == null) ? 0 : getIsCheck().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
         result = prime * result + ((getIsDelete() == null) ? 0 : getIsDelete().hashCode());
@@ -89,6 +94,7 @@ public class Note {
         sb.append(", lecturer=").append(lecturer);
         sb.append(", toolTip=").append(toolTip);
         sb.append(", noteStatus=").append(noteStatus);
+        sb.append(", isCheck=").append(isCheck);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", isDelete=").append(isDelete);

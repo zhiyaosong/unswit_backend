@@ -81,6 +81,7 @@ create table if not exists `note`
       toolTip    text                comment '笔记描述',
 
       noteStatus int default 0       not null comment '状态 0-正常,1-封号',
+      isCheck int default 0 not null comment '状态 0-未审核，1-审核通过',
       createTime datetime default CURRENT_TIMESTAMP comment '创建时间',
       updateTime datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP comment '更新时间',
       isDelete   tinyint default 0   not null comment '是否删除',
