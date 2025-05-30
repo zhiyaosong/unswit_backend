@@ -56,9 +56,9 @@ create table if not exists `course`
 
 INSERT INTO user_centre.course (code, title, category, toolTip, runTime
 ) VALUES (
-  '6713','自然语言处理','1','这是一门好课，我也是一个好笔记','123');
+  '6713','自然语言处理','1','这是一门好课6713','123');
 
-drop table if exists notes;
+drop table if exists note;
 
 create table if not exists `note`
 (
@@ -79,7 +79,7 @@ create table if not exists `note`
 ) comment '笔记';
 
 INSERT INTO user_centre.note (
-        course_id, title, link, author, lecturer, toolTip)
+        courseId, title, link, author, lecturer, toolTip)
 VALUES ('1','6713笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
         'yang','joshi','这是yang的6713笔记');
 

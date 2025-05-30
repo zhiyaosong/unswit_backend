@@ -2,15 +2,12 @@ package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.model.domain.Course;
 import com.unswit.usercenter.model.domain.Note;
-import com.unswit.usercenter.model.domain.Notes;
 import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
-import com.unswit.usercenter.service.NotesService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +39,7 @@ public class CourseController {
             Long courseId = course.getId();
             //按照courseid查询笔记
             List<Note> notes = noteService.list(
-                    new QueryWrapper<Note>().eq("course_id", courseId)
+                    new QueryWrapper<Note>().eq("courseId", courseId)
             );
             CourseNoteDTO courseNoteDTO = new CourseNoteDTO();
             courseNoteDTO.setCourseId(courseId);
