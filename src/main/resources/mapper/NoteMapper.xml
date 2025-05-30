@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unswit.usercenter.mapper.NoteMapper">
+
+    <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.Note">
+            <id property="id" column="id" />
+            <result property="courseId" column="courseId" />
+            <result property="title" column="title" />
+            <result property="link" column="link" />
+            <result property="author" column="author" />
+            <result property="lecturer" column="lecturer" />
+            <result property="toolTip" column="toolTip" />
+            <result property="noteStatus" column="noteStatus" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+            <result property="isDelete" column="isDelete" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,courseId,title,link,author,lecturer,
+        toolTip,noteStatus,createTime,updateTime,isDelete
+    </sql>
+</mapper>
