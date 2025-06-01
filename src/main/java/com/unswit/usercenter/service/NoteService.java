@@ -12,4 +12,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface NoteService extends IService<Note> {
 
     ErrorCode addNote(Note note);
+
+    boolean auditNoteAndUpdateUser(long id);
 }

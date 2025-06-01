@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="generator.mapper.NoteMapper">
+<mapper namespace="com.unswit.usercenter.mapper.NoteMapper">
 
-    <resultMap id="BaseResultMap" type="generator.domain.Note">
+    <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.Note">
             <id property="id" column="id" />
             <result property="courseId" column="courseId" />
             <result property="title" column="title" />
@@ -17,11 +17,13 @@
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
+            <result property="userId" column="userId" />
+            <result property="isOfficial" column="isOfficial" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,courseId,title,link,author,lecturer,
         toolTip,noteStatus,isCheck,createTime,updateTime,
-        isDelete
+        isDelete,userId,isOfficial
     </sql>
 </mapper>

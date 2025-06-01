@@ -1,22 +1,19 @@
 package com.unswit.usercenter.model.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户实体
+ * @TableName user
  */
-@TableName(value = "user")
+@TableName(value ="user")
 @Data
-public class User implements Serializable {
-
-    @TableId(type = IdType.AUTO)
+public class User {
     private Long id;
 
-    private String userName;
+    private String username;
 
     private String userAccount;
 
@@ -38,11 +35,11 @@ public class User implements Serializable {
 
     private Date updateTime;
 
-    @TableLogic
     private Integer isDelete;
 
     private Integer userRole;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    private String phone;
+
+    private Integer isMember;
 }

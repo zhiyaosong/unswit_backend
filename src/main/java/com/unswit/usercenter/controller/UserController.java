@@ -37,6 +37,7 @@ public class UserController {
             return "Welcome to the API";
         }
     }
+
     @GetMapping("/list")
     public BaseResponse<List<User>> getUserList(HttpServletRequest request) {
         System.out.println("收到查询");
@@ -96,7 +97,7 @@ public class UserController {
         User user = userService.userLogin(userAccount, userPassword, request);
         if (user == null) {
             // 前端弹窗内容是desc内容
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"密码错误msg","密码错误desc");
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码错误msg", "密码错误desc");
         }
         return ResultUtils.success(user);
     }
