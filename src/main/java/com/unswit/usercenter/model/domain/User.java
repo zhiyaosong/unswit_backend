@@ -1,5 +1,8 @@
 package com.unswit.usercenter.model.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -11,9 +14,10 @@ import java.util.Date;
 @TableName(value ="user")
 @Data
 public class User {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String username;
+    private String userName;
 
     private String userAccount;
 
@@ -35,11 +39,10 @@ public class User {
 
     private Date updateTime;
 
+    @TableLogic
     private Integer isDelete;
 
     private Integer userRole;
 
     private String phone;
-
-    private Integer isMember;
 }

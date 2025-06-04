@@ -28,18 +28,7 @@ public class NoteController {
         if(user == null) {
             return ResultUtils.error(ErrorCode.NOT_LOGIN);
         }
-        //取出用户的会员状态
-        Integer isMember = user.getIsMember();
-        List<Note> notes;
-        if (isMember != null && isMember == 0) {
-            // 非会员：只查看官方笔记（isOfficial = 0）
-            LambdaQueryWrapper<Note> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(Note::getIsOfficial, 0);
-            notes = noteService.list(wrapper);
-        } else {
-            // 会员：查看全部笔记
-            notes = noteService.list();
-        }
+        List<Note> notes = noteService.getAllNotes(user);
         // 3. 如果查询结果为空，返回空列表或错误
         if (notes == null || notes.isEmpty()) {
             return ResultUtils.error(ErrorCode.NULL_ERROR);
@@ -48,8 +37,9 @@ public class NoteController {
         return ResultUtils.success(notes);
     }
     @PostMapping("add")
-    public ErrorCode addNote(@RequestBody Note note) {
-        return noteService.addNote(note);
+    public BaseResponse<List<Note>> addNote(@RequestBody Note note, @RequestBody User user) {
+        List<Note> notes = noteService.addNote(note, user);
+        return ResultUtils.success(notes);
     }
 
     @PostMapping("audit/{id}")

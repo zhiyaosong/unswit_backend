@@ -13,7 +13,7 @@
             <result property="lecturer" column="lecturer" />
             <result property="toolTip" column="toolTip" />
             <result property="noteStatus" column="noteStatus" />
-            <result property="isCheck" column="isCheck" />
+            <result property="isChecked" column="isChecked" />
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />
@@ -23,7 +23,7 @@
 
     <sql id="Base_Column_List">
         id,courseId,title,link,author,lecturer,
-        toolTip,noteStatus,isCheck,createTime,updateTime,
+        toolTip,noteStatus,isChecked,createTime,updateTime,
         isDelete,userId,isOfficial
     </sql>
 </mapper>

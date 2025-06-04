@@ -1,8 +1,13 @@
 package com.unswit.usercenter.service;
 
+import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.model.domain.Note;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.unswit.usercenter.model.domain.User;
+
+import java.util.List;
+
 
 /**
 * @author zhiyao
@@ -11,7 +16,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface NoteService extends IService<Note> {
 
-    ErrorCode addNote(Note note);
+    List<Note> addNote(Note note, User user);
+
+    List<Note> getAllNotes(User user);
 
     boolean auditNoteAndUpdateUser(long id);
 }

@@ -27,7 +27,7 @@ public class Note {
 
     private Integer noteStatus;
 
-    private Integer isCheck;
+    private Integer isChecked;
 
     private Date createTime;
 

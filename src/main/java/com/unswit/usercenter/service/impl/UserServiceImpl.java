@@ -86,9 +86,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
         if (StringUtils.isNotBlank(userName)) {
-            user.setUsername(userName);
+            user.setUserName(userName);
         }else {
-            user.setUsername("编程侠");   // 默认用户名，与用户账户不一样
+            user.setUserName("编程侠");   // 默认用户名，与用户账户不一样
         }
         user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像（宝贝的玄凤）
         user.setGender(0);   // 0 代表未知， 1 代表男， 2代表女， 3代表中性
@@ -159,7 +159,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         User safetyUser = new User();
         safetyUser.setId(originUser.getId());
-        safetyUser.setUsername(originUser.getUsername());
+        safetyUser.setUserName(originUser.getUserName());
         safetyUser.setUserAccount(originUser.getUserAccount());
         safetyUser.setAvatarUrl(originUser.getAvatarUrl());
         safetyUser.setGender(originUser.getGender());
