@@ -51,6 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public long userRegister(String userName, String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
+        // 这个在controller层已经校验过了
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
@@ -68,6 +69,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return -2;
         }
         // 密码和校验密码不相同
+        // 前端表单自带校验，但是要防止爬虫之类的
         if (!userPassword.equals(checkPassword)) {
             return -1;
         }
@@ -85,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
+        // userName前面没有检验，所以这里要校验一下。没填默认编程侠
         if (StringUtils.isNotBlank(userName)) {
             user.setUserName(userName);
         }else {
@@ -157,6 +160,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (originUser == null) {
             return null;
         }
+        // 把password摘出去，可以用userDTO方法代替
         User safetyUser = new User();
         safetyUser.setId(originUser.getId());
         safetyUser.setUserName(originUser.getUserName());
@@ -181,5 +185,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
     }
-
 }

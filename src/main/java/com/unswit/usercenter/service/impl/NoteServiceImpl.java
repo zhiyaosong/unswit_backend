@@ -1,7 +1,6 @@
 package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.exception.BusinessException;
@@ -39,14 +38,14 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         Integer userRole = user.getUserRole();
         List<Note> notes;
 
-//        QueryWrapper<Note> wrapper = new QueryWrapper<>();
+        QueryWrapper<Note> notesWrapper = new QueryWrapper<>();
         if (userRole == 2) {
             // 非会员：只查看官方笔记（isOfficial = 0)
-//            wrapper.eq("isOfficial", 0);
-            notes = noteMapper.selectList(query().eq("isOfficial", 0));
+            notesWrapper.eq("isOfficial", 0);
+            notes = noteMapper.selectList(notesWrapper);
         } else {
-            // 会员：查看全部笔记
-            notes = noteMapper.selectList(query());
+            // 会员和管理员：查看全部笔记
+            notes = noteMapper.selectList(notesWrapper);
         }
         return notes;
     }

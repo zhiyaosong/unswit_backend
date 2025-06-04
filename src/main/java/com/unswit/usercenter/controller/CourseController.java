@@ -22,8 +22,6 @@ import java.util.List;
 public class CourseController {
     @Resource
     private CourseService courseService;
-    @Resource
-    private NoteService noteService;
     /**
      * 查询所有课程，并以JSON数组形式返回
      * 尾部拼接每个课程对应的note列表

@@ -2,8 +2,6 @@ package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.mapper.CourseMapper;
 import com.unswit.usercenter.mapper.NoteMapper;
@@ -34,7 +32,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
     @Override
     public List<CourseNoteDTO> getAllCourseNote() {
         // 查询所有课程
-        List<Course> courses = courseMapper.selectList(query());
+        QueryWrapper<Course> courseWrapper = new QueryWrapper<>();
+        List<Course> courses = courseMapper.selectList(courseWrapper);
 
         //遍历每个课程 查询它的所有笔记
         List<CourseNoteDTO> courseNoteDTOS = new ArrayList<>(courses.size());
@@ -42,9 +41,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
             Long courseId = course.getId();
             //按照course id查询笔记
             List<Note> notes = noteMapper.selectList(
-                    new QueryWrapper<Note>().eq("courseId", courseId)
+                    new QueryWrapper<Note>()
+                            .eq("courseId", courseId)
+                            .eq("isDelete", 0)
             );
             CourseNoteDTO courseNoteDTO = new CourseNoteDTO();
+            // set每一个课程DTO
             courseNoteDTO.setCourseId(courseId);
             courseNoteDTO.setCategory(course.getCategory());
             courseNoteDTO.setTitle(course.getTitle());
