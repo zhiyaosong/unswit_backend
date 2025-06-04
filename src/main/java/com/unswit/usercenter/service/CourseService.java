@@ -1,7 +1,10 @@
 package com.unswit.usercenter.service;
 
+import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.model.domain.Course;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author zhiyao
@@ -10,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface CourseService extends IService<Course> {
 
+
+    List<CourseNoteDTO> getAllCourseNote();
 }

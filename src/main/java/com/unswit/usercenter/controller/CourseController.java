@@ -2,6 +2,7 @@ package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.unswit.usercenter.common.BaseResponse;
+import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.model.domain.Course;
@@ -29,26 +30,10 @@ public class CourseController {
      */
     @GetMapping()
     public BaseResponse<List<CourseNoteDTO>> getAllCourseNote() {
-        // 查询所有课程
-        List<Course> courses = courseService.list();
-        //遍历每个课程 查询它的所有笔记
-        List<CourseNoteDTO> courseNoteDTOS = new ArrayList<>(courses.size());
-        for(Course course : courses) {
-            Long courseId = course.getId();
-            //按照course id查询笔记
-            List<Note> notes = noteService.list(
-                    new QueryWrapper<Note>().eq("courseId", courseId)
-            );
-            CourseNoteDTO courseNoteDTO = new CourseNoteDTO();
-            courseNoteDTO.setCourseId(courseId);
-            courseNoteDTO.setCategory(course.getCategory());
-            courseNoteDTO.setTitle(course.getTitle());
-            courseNoteDTO.setNoteList(notes);
-            courseNoteDTO.setCode(course.getCode());
-            courseNoteDTO.setEnrollTerm(course.getEnrollTerm());
-            courseNoteDTO.setToolTip(course.getToolTip());
-            courseNoteDTOS.add(courseNoteDTO);
+        List<CourseNoteDTO> allCourseNote = courseService.getAllCourseNote();
+        if (allCourseNote.isEmpty()) {
+            return ResultUtils.error(ErrorCode.NULL_ERROR);
         }
-        return ResultUtils.success(courseNoteDTOS);
+        return ResultUtils.success(allCourseNote);
     }
 }

@@ -1,6 +1,7 @@
 package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.exception.BusinessException;
@@ -21,7 +22,6 @@ import java.util.List;
 * @description 针对表【note(笔记)】的数据库操作Service实现
 * @createDate 2025-05-30 14:13:42
 */
-@Transactional
 @Service
 public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     implements NoteService{
@@ -32,19 +32,21 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     @Resource
     private NoteMapper noteMapper;
 
+
     @Override
     public List<Note> getAllNotes(User user) {
         //取出用户的会员状态
         Integer userRole = user.getUserRole();
         List<Note> notes;
-        QueryWrapper<Note> wrapper = new QueryWrapper<>();
+
+//        QueryWrapper<Note> wrapper = new QueryWrapper<>();
         if (userRole == 2) {
             // 非会员：只查看官方笔记（isOfficial = 0)
-            wrapper.eq("isOfficial", 0);
-            notes = noteMapper.selectList(wrapper);
+//            wrapper.eq("isOfficial", 0);
+            notes = noteMapper.selectList(query().eq("isOfficial", 0));
         } else {
             // 会员：查看全部笔记
-            notes = noteMapper.selectList(wrapper);
+            notes = noteMapper.selectList(query());
         }
         return notes;
     }
