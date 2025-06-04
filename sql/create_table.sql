@@ -84,7 +84,7 @@ create table if not exists `note`
       author     varchar(512)        not null comment '笔记作者自定义名',
       userId     bigint              not null comment '发布者id',
       lecturer   varchar(512)        comment '任课教师',
-      isOfficial tinyint             comment '是否是官方笔记：0：官方，1：非官方',
+      isOfficial tinyint   default 0 not null comment '是否是官方笔记：1：官方，0：非官方',
       toolTip    text                comment '笔记描述',
       noteStatus int default 0       not null comment '状态 0-正常,1-封号',
       isChecked  int default 0       not null comment '状态 0-未审核，1-审核通过',
@@ -98,23 +98,23 @@ create table if not exists `note`
 ) comment '笔记';
 
 INSERT INTO user_centre.note (
-        courseId, title, link, author, userId, lecturer, toolTip)
+        courseId, title, link, author, userId, lecturer, toolTip,isOfficial)
 VALUES ('1','6713笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','joshi','这是yang的6713笔记');
+        'yang','1','joshi','这是yang的6713笔记', '1');
 
 INSERT INTO user_centre.note (
-    courseId, title, link, author, userId, lecturer, toolTip)
+    courseId, title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('1','6713笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','XXX','这是yang的6713笔记2号');
+        'yang','1','XXX','这是yang的6713笔记2号', '1');
 
 INSERT INTO user_centre.note (
-    courseId, title, link, author, userId, lecturer, toolTip)
+    courseId, title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('2','9417笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','9417-lecturer','这是yang的9417笔记');
+        'yang','1','9417-lecturer','这是yang的9417笔记', '1');
 
 INSERT INTO user_centre.note (
-    courseId, title, link, author, userId, lecturer, toolTip)
+    courseId, title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('3','9101笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','9101-lecturer','这是yang的9101笔记');
+        'yang','1','9101-lecturer','这是yang的9101笔记', '1');
 
 
