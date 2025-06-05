@@ -82,24 +82,12 @@ public class UserController {
      *
      * @param userLoginRequest
      * @param request
-     * @return
+     * @return token
      */
     @PostMapping("/login")
-    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        if (userLoginRequest == null) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
-        }
-        String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
-        }
-        User user = userService.userLogin(userAccount, userPassword, request);
-        if (user == null) {
-            // 前端弹窗内容是desc内容
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码错误msg", "密码错误desc");
-        }
-        return ResultUtils.success(user);
+    public BaseResponse userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        //实现登陆功能
+        return userService.userLogin(userLoginRequest,request);
     }
 
     /**

@@ -1,23 +1,37 @@
 package com.unswit.usercenter.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
+import com.unswit.usercenter.model.domain.request.UserLoginRequest;
 import com.unswit.usercenter.service.UserService;
 import com.unswit.usercenter.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
+import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
+import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
 
 /**
  * 用户服务实现类
@@ -29,6 +43,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 盐值，混淆密码
@@ -104,12 +120,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     /**
-     * 用户登录
+     * 用户登陆
+     * @param userLoginRequest
+     * @param request
+     * @return token
+     */
+    @Override
+    public BaseResponse userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        //1.判空 返回错误
+        if (userLoginRequest == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        //2.返回加密信息
+        User user = userLogin(userAccount, userPassword, request);
+
+        if (user == null) {
+            // 前端弹窗内容是desc内容
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码错误msg", "密码错误desc");
+        }
+        //保存用户到Redis
+        //1.生成token，生成登陆令牌
+        String token = UUID.randomUUID().toString(true);
+        //2.将User对象转为Hash存储
+        UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO,new HashMap<>(),
+                CopyOptions.create()
+                        .setIgnoreNullValue(true)
+                        .setFieldValueEditor((fieldName, fieldValue)->fieldValue.toString()));
+        //3.存储
+        String tokenKey = LOGIN_USER_KEY+token;
+        stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);
+        stringRedisTemplate.expire(tokenKey,LOGIN_USER_TTL, TimeUnit.MINUTES);
+        //返回token给客户端
+        System.out.println("返回token给客户端");
+        //return Result.ok(token);
+        return ResultUtils.success(token);
+
+    }
+    /**
      *
+     * 返回脱敏后的加密的用户信息
      * @param userAccount  用户账户
      * @param userPassword 用户密码
      * @param request
-     * @return 脱敏后的用户信息
+     * @return 返回脱敏后的加密的用户信息
      */
     @Override
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
@@ -149,19 +208,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return safetyUser;
     }
 
+
+
     /**
-     * 用户脱敏 ？
+     * 用户脱敏
      *
      * @param originUser
-     * @return
+     * @return 返回脱敏后的原始数据
      */
     @Override
     public User getSafetyUser(User originUser) {
         if (originUser == null) {
             return null;
         }
-        // 把password摘出去，可以用userDTO方法代替
+
         User safetyUser = new User();
+       // User safetyUser = BeanUtil.copyProperties(originUser, User.class);
         safetyUser.setId(originUser.getId());
         safetyUser.setUserName(originUser.getUserName());
         safetyUser.setUserAccount(originUser.getUserAccount());
@@ -185,4 +247,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
     }
+
 }
