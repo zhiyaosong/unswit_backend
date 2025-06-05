@@ -146,7 +146,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //保存用户到Redis
         //1.生成token，生成登陆令牌
         String token = UUID.randomUUID().toString(true);
-        //2.将User对象转为Hash存储
+        //2.将User对象转为Hash存储， userDTO里只有id和userName
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO,new HashMap<>(),
                 CopyOptions.create()
