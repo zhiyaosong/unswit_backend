@@ -39,7 +39,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         UserHolder.saveUser(userDTO);
         System.out.println("保存用户到ThreadLocal中");
         // 刷新token有效期
-        stringRedisTemplate.expire(key,RedisConstants.LOGIN_CODE_TTL, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(key, RedisConstants.LOGIN_CODE_TTL, TimeUnit.MINUTES);
         //放行
         return true;
     }

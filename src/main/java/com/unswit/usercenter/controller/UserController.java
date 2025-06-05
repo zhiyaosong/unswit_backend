@@ -119,9 +119,19 @@ public class UserController {
             throw new BusinessException(ErrorCode.NOT_LOGIN);
         }
         long userId = currentUser.getId();
-        // TODO 校验用户是否合法
+        // 校验用户是否合法
         User user = userService.getById(userId);
+        if (user==null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (user.getIsDelete()==1) {
+            throw new BusinessException("用户已被删除",50001,"");
+        }
+        if (user.getUserStatus()==1) {
+            throw new BusinessException("用户被封号",50002,"");
+        }
         User safetyUser = userService.getSafetyUser(user);
+
         return ResultUtils.success(safetyUser);
     }
 
