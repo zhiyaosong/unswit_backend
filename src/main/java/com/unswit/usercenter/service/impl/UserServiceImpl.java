@@ -3,6 +3,7 @@ package com.unswit.usercenter.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.BaseResponse;
@@ -41,6 +42,7 @@ import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         implements UserService {
 
+
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -49,7 +51,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     /**
      * 盐值，混淆密码
      */
-    private static final String SALT = "yang";
+    private static final String SALT = "unswit";
+
+    @Override
+    public User getUserByToken(String token) {
+        String tokenKey = LOGIN_USER_KEY + token;
+        if (!stringRedisTemplate.hasKey(tokenKey)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+        }
+        Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(tokenKey);
+        // 将 Redis 里的 Map 再转回 UserDTO
+        UserDTO userDTO = BeanUtil.mapToBean(userMap, UserDTO.class, true);
+
+        // 校验用户是否合法
+        Long userId = userDTO.getId();
+        User user = userMapper.selectById(userId);
+        if (user==null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (user.getIsDelete()==1) {
+            throw new BusinessException("用户已被删除",50001,"");
+        }
+        if (user.getUserStatus()==1) {
+            throw new BusinessException("用户被封号",50002,"");
+        }
+        User safetyUser = getSafetyUser(user);
+        return safetyUser;
+    }
 
     /**
      * 用户注册
@@ -116,32 +144,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!saveResult) {
             return -3;
         }
+        System.out.println("返回Id");
         return user.getId();
     }
 
     /**
-     * 用户登陆
-     * @param userLoginRequest
-     * @param request
-     * @return token
+     *
+     * 返回生成的token
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @return 生成的token
      */
     @Override
-    public BaseResponse userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        //1.判空 返回错误
-        if (userLoginRequest == null) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
-        }
-        String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
+    public String userLogin(String userAccount, String userPassword) {
+        // 1. 校验
+        // 有可能从其他地方（非control（/login）里）调用吗？
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+            return null;
         }
-        //2.返回加密信息
-        User user = userLogin(userAccount, userPassword, request);
+        if (userAccount.length() < 4) {
+            return null;
+        }
+        if (userPassword.length() < 6) {
+            return null;
+        }
+        // 账户只能由字母、数字和下划线组成
+        String validPattern = "^[a-zA-Z0-9_]+$";
+        Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
+        if (!matcher.matches()) {
+            return "账户不符合要求";
+        }
+        // 2. 加密
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        System.out.println("加密后密码"+encryptPassword);
+        // 查询用户是否存在
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAccount);
+        queryWrapper.eq("userPassword", encryptPassword);
+        User user = userMapper.selectOne(queryWrapper);
 
         if (user == null) {
             // 前端弹窗内容是desc内容
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码错误msg", "密码错误desc");
+            System.out.println("用户为空");
+            return "用户为空";
         }
         //保存用户到Redis
         //1.生成token，生成登陆令牌
@@ -159,53 +204,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //返回token给客户端
         System.out.println("返回token给客户端");
         //return Result.ok(token);
-        return ResultUtils.success(token);
+        return token;
 
-    }
-    /**
-     *
-     * 返回脱敏后的加密的用户信息
-     * @param userAccount  用户账户
-     * @param userPassword 用户密码
-     * @param request
-     * @return 返回脱敏后的加密的用户信息
-     */
-    @Override
-    public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
-        // 1. 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
-        }
-        if (userAccount.length() < 4) {
-            return null;
-        }
-        if (userPassword.length() < 6) {
-            return null;
-        }
-        // 账户只能由字母、数字和下划线组成
-        String validPattern = "^[a-zA-Z0-9_]+$";
-        Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
-        if (!matcher.matches()) {
-            return null;
-        }
-        // 2. 加密
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-        System.out.println("加密后密码"+encryptPassword);
-        // 查询用户是否存在
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("userPassword", encryptPassword);
-        User user = userMapper.selectOne(queryWrapper);
-        // 用户不存在
-        if (user == null) {
-            log.info("user login failed, userAccount cannot match userPassword");
-            return null;
-        }
-        // 3. 用户脱敏
-        User safetyUser = getSafetyUser(user);
-        // 4. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
-        return safetyUser;
+//        // 3. 用户脱敏
+//        User safetyUser = getSafetyUser(user);
+//        // 4. 记录用户的登录态
+//        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
+//        return safetyUser;
     }
 
 
@@ -242,9 +247,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @param request
      */
     @Override
-    public int userLogout(HttpServletRequest request) {
-        // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+    public int userLogout(HttpServletRequest request, String token) {
+//        // 移除登录态
+//        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        if (StrUtil.isNotBlank(token)) {
+            stringRedisTemplate.delete(LOGIN_USER_KEY + token);
+        }
         return 1;
     }
 

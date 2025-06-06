@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.model.domain.request.UserLoginRequest;
@@ -14,11 +15,20 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.unswit.usercenter.contant.UserConstant.ADMIN_ROLE;
 import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
+import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
+import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import cn.hutool.core.bean.BeanUtil;
 
 /**
  * 用户接口
@@ -29,14 +39,6 @@ public class UserController {
 
     @Resource
     private UserService userService;
-
-    @RestController
-    public class HomeController {
-        @GetMapping("/")
-        public String home() {
-            return "Welcome to the API";
-        }
-    }
 
     @GetMapping("/list")
     public BaseResponse<List<User>> getUserList(HttpServletRequest request) {
@@ -64,6 +66,7 @@ public class UserController {
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         // 校验
         if (userRegisterRequest == null) {
+            System.out.println("请求为空");
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userName = userRegisterRequest.getUserName();
@@ -71,9 +74,24 @@ public class UserController {
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+            System.out.println("字段为空");
             return null;
         }
+        /**
+         * error:
+         *      {-2: "账户不是由字母、数字和下划线组成",
+         *       -1: "密码和校验密码不相同"，
+         *       -3: "数据存入失败"}
+         */
         long result = userService.userRegister(userName, userAccount, userPassword, checkPassword);
+        if (result == -1 || result == -2) {
+            System.out.println("账户不符合，两次密码不一致");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (result == -3) {
+            System.out.println("存入失败");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
         return ResultUtils.success(result);
     }
 
@@ -81,13 +99,42 @@ public class UserController {
      * 用户登录
      *
      * @param userLoginRequest
-     * @param request
      * @return token
      */
     @PostMapping("/login")
-    public BaseResponse userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<String> userLogin(
+            @RequestBody UserLoginRequest userLoginRequest,
+            HttpServletResponse response) {
         //实现登陆功能
-        return userService.userLogin(userLoginRequest,request);
+        //1.判空 返回错误
+        if (userLoginRequest == null) {
+            System.out.println("请求为空");
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+
+        String token = userService.userLogin(userAccount, userPassword);
+        if (Objects.equals(token, "用户为空") || Objects.equals(token, "账户不符合要求") || token == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 2. 把 token 写进 HttpOnly Cookie
+        Cookie cookie = new Cookie("access_token", token);
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);                         // 生产环境强制 HTTPS
+        cookie.setPath("/");                             // 整个域名下都带该 Cookie
+        cookie.setMaxAge((int) TimeUnit.MINUTES.toSeconds(30)); // 30 分钟过期
+        // 如果需要 SameSite，可用 Spring Boot 2.7+ 的 ResponseCookie
+        // ResponseCookie rc = ResponseCookie.from("access_token", token)
+        //         .httpOnly(true).secure(true).path("/").maxAge(30 * 60).sameSite("Lax").build();
+        // response.addHeader(HttpHeaders.SET_COOKIE, rc.toString());
+        response.addCookie(cookie);
+        System.out.println("已加入cookie");
+        return ResultUtils.success("ok");
     }
 
     /**
@@ -97,11 +144,25 @@ public class UserController {
      * @return
      */
     @PostMapping("/logout")
-    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+    public BaseResponse<Integer> userLogout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @CookieValue("access_token") String token) {
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        int result = userService.userLogout(request);
+        int result = 0;
+        if (token != null) {
+            result = userService.userLogout(request, token);
+        }
+        // 同时让前端“清除”该 Cookie
+        Cookie cookie = new Cookie("access_token", "");
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 立即过期
+        response.addCookie(cookie);
+
         return ResultUtils.success(result);
     }
 
@@ -112,25 +173,17 @@ public class UserController {
      * @return
      */
     @GetMapping("/current")
-    public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
-        if (currentUser == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN);
+    public BaseResponse<User> getUserByToken(
+            HttpServletRequest request,
+            @CookieValue(name = "access_token", required = false) String token
+            ) {
+//        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+//        User currentUser = (User) userObj;
+        if (token == null || token.isEmpty()) {
+            throw new BusinessException("未携带登录 token",50002,"");
         }
-        long userId = currentUser.getId();
-        // 校验用户是否合法
-        User user = userService.getById(userId);
-        if (user==null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        if (user.getIsDelete()==1) {
-            throw new BusinessException("用户已被删除",50001,"");
-        }
-        if (user.getUserStatus()==1) {
-            throw new BusinessException("用户被封号",50002,"");
-        }
-        User safetyUser = userService.getSafetyUser(user);
+
+        User safetyUser = userService.getUserByToken(token);
 
         return ResultUtils.success(safetyUser);
     }

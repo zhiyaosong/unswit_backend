@@ -6,7 +6,9 @@ create database if not exists user_centre;
 -- 切换库
 use user_centre;
 
-# # 如果用户表已存在,则删除
+# 按顺序drop，因为有外键
+drop table if exists note;
+drop table if exists course;
 drop table if exists user;
 
 # 用户表
@@ -20,7 +22,7 @@ create table if not exists `user`
     userPassword varchar(512)                       not null comment '密码(MD5 Hash)',
     admissionTime varchar(256)                      null comment '入学时间（早于24T1，24T1, 24T2, 24T3, 25T1, 25T2, 25T3, 晚于25T3）',
     email        varchar(512)                       null comment '邮箱',
-    phone        varchar(256)                                            ,
+    phone        varchar(256)                       null comment '手机号',
     selfDescription  TEXT                           null comment '自我描述',
 
     userStatus   int      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
@@ -41,7 +43,7 @@ INSERT INTO user_centre.user (
   '24T1', null, '我是一个热爱学习编程的学生。', 0,
   '2023-08-06 14:14:22', '2023-08-06 14:39:37', 1);
 
-drop table if exists course;
+
 
 create table if not exists `course`
 (
@@ -73,7 +75,7 @@ INSERT INTO user_centre.course (code, title, category, toolTip, enrollTerm
 ) VALUES (
              '0000','其他','99','其他','0');
 
-drop table if exists note;
+
 
 create table if not exists `note`
 (

@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface UserService extends IService<User> {
 
+
+    User getUserByToken(String token);
+
     long userRegister(String userName, String userAccount, String userPassword, String checkPassword);
 
     /**
@@ -20,8 +23,7 @@ public interface UserService extends IService<User> {
      *
      * @return 脱敏后的用户信息
      */
-    User userLogin(String userAccount, String userPassword, HttpServletRequest request);
-    BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request);
+    String userLogin(String userAccount, String userPassword);
     /**
      * 用户脱敏
      *
@@ -30,11 +32,13 @@ public interface UserService extends IService<User> {
      */
     User getSafetyUser(User originUser);
 
+
+
     /**
      * 用户注销
      *
      * @param request
      * @return
      */
-    int userLogout(HttpServletRequest request);
+    int userLogout(HttpServletRequest request, String token);
 }
