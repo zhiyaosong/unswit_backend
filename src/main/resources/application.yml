@@ -16,6 +16,7 @@ spring:
     # 默认6379
     port: 6379
     host: localhost
+    #database: 0
 server:
   port: 8080
   servlet:
