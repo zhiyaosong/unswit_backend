@@ -179,6 +179,7 @@ public class UserController {
             ) {
 //        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 //        User currentUser = (User) userObj;
+        System.out.println("进入control");
         if (token == null || token.isEmpty()) {
             throw new BusinessException("未携带登录 token",50002,"");
         }

@@ -1,6 +1,5 @@
 package com.unswit.usercenter.config;
 
-
 import com.unswit.usercenter.utils.LoginInterceptor;
 import com.unswit.usercenter.utils.RefreshTokenInterceptor;
 import org.springframework.context.annotation.Configuration;
@@ -19,10 +18,8 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .excludePathPatterns(
-                        //需要检查是否登陆的路径
-                        "/user/login",
-                        "/note/add",
-                        "/note/audit"
+                        // 放行的路径
+                        "/**"
                         ).order(1);
         registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).order(0);
 

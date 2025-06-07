@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
 import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
@@ -55,6 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public User getUserByToken(String token) {
+        System.out.println("拿到token:" + token);
         String tokenKey = LOGIN_USER_KEY + token;
         if (!stringRedisTemplate.hasKey(tokenKey)) {
             throw new BusinessException(ErrorCode.NOT_LOGIN);
@@ -62,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(tokenKey);
         // 将 Redis 里的 Map 再转回 UserDTO
         UserDTO userDTO = BeanUtil.mapToBean(userMap, UserDTO.class, true);
-
+        System.out.println(userDTO);
         // 校验用户是否合法
         Long userId = userDTO.getId();
         User user = userMapper.selectById(userId);
@@ -176,6 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        System.out.println("UserAccount:" + userAccount);
         System.out.println("加密后密码"+encryptPassword);
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -193,14 +197,57 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String token = UUID.randomUUID().toString(true);
         //2.将User对象转为Hash存储， userDTO里只有id和userName
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
-        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO,new HashMap<>(),
+        Map<String, Object> userMap = BeanUtil.beanToMap(
+                userDTO,
+                new HashMap<>(),
                 CopyOptions.create()
                         .setIgnoreNullValue(true)
-                        .setFieldValueEditor((fieldName, fieldValue)->fieldValue.toString()));
+                        .setFieldValueEditor((fieldName, fieldValue)->{
+                            // setFieldValueEditor优先级高于setIgnoreNullValue，所以这里也要判空
+                            if(fieldValue == null){
+                                return null;
+                            }
+                            return fieldValue.toString();
+                        }));
+
         //3.存储
         String tokenKey = LOGIN_USER_KEY+token;
-        stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);
-        stringRedisTemplate.expire(tokenKey,LOGIN_USER_TTL, TimeUnit.MINUTES);
+        try{
+            stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);
+            stringRedisTemplate.expire(tokenKey,LOGIN_USER_TTL, TimeUnit.MINUTES);
+        } catch(ClassCastException cce){
+            // 如果这里还报错，再次打印 Map 结构，以便尽快发现问题
+            System.err.println(">> [ERROR] Redis putAll 导致 ClassCastException，map 内容如下：");
+            throw cce;
+        }
+
+        // 3. 维护用户的 token 列表
+        String userSessionsKey = "user_sessions:" + user.getId();
+        System.out.println("userSessionsKey:" + userSessionsKey);
+        final int MAX_SESSIONS = 3;
+
+        // 把新 token 推到左边（列表头）
+        stringRedisTemplate.opsForList().leftPush(userSessionsKey, token);
+        // 保证列表只保留最新的 MAX_SESSIONS 个
+        stringRedisTemplate.opsForList().trim(userSessionsKey, 0, MAX_SESSIONS - 1);
+        // 查出被「踢下线」的多余 token（范围：从第 MAX_SESSIONS 个到末尾）
+        List<String> expiredTokens =
+                stringRedisTemplate.opsForList().range(userSessionsKey, MAX_SESSIONS, -1);
+        System.out.println("expiredTokens:" + expiredTokens);
+
+        if (expiredTokens != null && !expiredTokens.isEmpty()) {
+            for (String oldToken : expiredTokens) {
+                // 1) 删除旧的会话数据
+                String oldTokenKey = LOGIN_USER_KEY + oldToken;
+                System.out.println("已删除oldTokenKey:" + oldTokenKey);
+                stringRedisTemplate.delete(oldTokenKey);
+                // 2) 从列表中移除（防止 trim 后保留）
+                stringRedisTemplate.opsForList().remove(userSessionsKey, 0, oldToken);
+            }
+        }
+        // 给 userSessionsKey 同步更新过期时间
+        stringRedisTemplate.expire(userSessionsKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
+
         //返回token给客户端
         System.out.println("返回token给客户端");
         //return Result.ok(token);
