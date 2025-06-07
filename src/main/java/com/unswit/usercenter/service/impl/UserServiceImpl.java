@@ -196,7 +196,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO,new HashMap<>(),
                 CopyOptions.create()
                         .setIgnoreNullValue(true)
-                        .setFieldValueEditor((fieldName, fieldValue)->fieldValue.toString()));
+                        //.setFieldValueEditor((fieldName, fieldValue)->fieldValue.toString()))
+                        .setFieldValueEditor((fieldName, fieldValue) -> {
+                            // 如果值为 null，就直接返回 null，后续 ignoreNullValue=true 会帮你自动跳过
+                            return fieldValue == null
+                                    ? null
+                                    : fieldValue.toString();
+                        }));
         //3.存储
         String tokenKey = LOGIN_USER_KEY+token;
         stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);

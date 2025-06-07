@@ -1,6 +1,7 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.sun.javaws.IconUtil;
 import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
@@ -169,24 +170,39 @@ public class UserController {
     /**
      * 获取当前用户
      *
-     * @param request
+     * @param
      * @return
      */
+//    @GetMapping("/current")
+//    public BaseResponse<User> getUserByToken(
+//            HttpServletRequest request,
+//            @CookieValue(name = "access_token", required = false) String token
+//            ) {
+////        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+////        User currentUser = (User) userObj;
+//        if (token == null || token.isEmpty()) {
+//            throw new BusinessException("未携带登录 token",50002,"");
+//        }
+//        System.out.println("已经形成safetyuser");
+//        User safetyUser = userService.getUserByToken(token);
+//        System.out.println("已经形成safetyuser");
+//
+//        return ResultUtils.success(safetyUser);
+//    }
     @GetMapping("/current")
     public BaseResponse<User> getUserByToken(
-            HttpServletRequest request,
-            @CookieValue(name = "access_token", required = false) String token
-            ) {
-//        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-//        User currentUser = (User) userObj;
-        if (token == null || token.isEmpty()) {
-            throw new BusinessException("未携带登录 token",50002,"");
+            @RequestHeader(name="Authorization", required=false) String auth
+    ) {
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            throw new BusinessException("未携带登录 token", 50002, "");
         }
-
+        String token = auth.substring(7);
         User safetyUser = userService.getUserByToken(token);
-
         return ResultUtils.success(safetyUser);
     }
+
+
+
 
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
