@@ -12,30 +12,27 @@ import java.util.Date;
 @Data
 public class Note {
     private Long id;
-
+    private Long userId;
+    // NoteRequestDTO中的字段:
+    private String title;
+    private String author;
+    private String lecturer;
+    private String link;
+    private String enrollTime;
+    // courseCode => courseId
     private Long courseId;
 
-    private String title;
+    private String toolTip;  //暂时不用
 
-    private String link;
+    private Integer noteStatus; // 默认正常
 
-    private String author;
-
-    private String lecturer;
-
-    private String toolTip;
-
-    private Integer noteStatus;
-
-    private Integer isChecked;
+    private Integer isChecked;  // 默认未检查
 
     private Date createTime;
 
     private Date updateTime;
 
     private Integer isDelete;
-
-    private Long userId;
 
     private Integer isOfficial;
 }

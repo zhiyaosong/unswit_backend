@@ -10,7 +10,6 @@
             <result property="title" column="title" />
             <result property="category" column="category" />
             <result property="toolTip" column="toolTip" />
-            <result property="enrollTerm" column="enrollTerm" />
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
             <result property="isDelete" column="isDelete" />

@@ -11,6 +11,7 @@
             <result property="link" column="link" />
             <result property="author" column="author" />
             <result property="lecturer" column="lecturer" />
+            <result property="enrollTime" column="enrollTime" />
             <result property="toolTip" column="toolTip" />
             <result property="noteStatus" column="noteStatus" />
             <result property="isChecked" column="isChecked" />
@@ -22,7 +23,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,courseId,title,link,author,lecturer,
+        id,courseId,title,link,author,lecturer,enrollTime,
         toolTip,noteStatus,isChecked,createTime,updateTime,
         isDelete,userId,isOfficial
     </sql>

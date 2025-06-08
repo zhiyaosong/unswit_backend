@@ -14,6 +14,7 @@ public class BusinessException extends RuntimeException {
     public BusinessException(String message, int code, String description) {
         super(message);
         this.code = code;
+        // description返回给前端
         this.description = description;
     }
 

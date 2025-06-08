@@ -18,17 +18,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.unswit.usercenter.contant.UserConstant.ADMIN_ROLE;
 import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
-import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
-import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import cn.hutool.core.bean.BeanUtil;
+
 
 /**
  * 用户接口
@@ -181,7 +177,7 @@ public class UserController {
 //        User currentUser = (User) userObj;
         System.out.println("进入control");
         if (token == null || token.isEmpty()) {
-            throw new BusinessException("未携带登录 token",50002,"");
+            throw new BusinessException("未携带登录 token",50002,"未登录，无法查看论坛等内容");
         }
 
         User safetyUser = userService.getUserByToken(token);

@@ -6,11 +6,10 @@ import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CourseNoteDTO;
 
+import com.unswit.usercenter.dto.UserIdRequest;
 import com.unswit.usercenter.service.CourseService;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -25,9 +24,11 @@ public class CourseController {
      * 查询所有课程，并以JSON数组形式返回
      * 尾部拼接每个课程对应的note列表
      */
-    @GetMapping()
-    public BaseResponse<List<CourseNoteDTO>> getAllCourseNote() {
-        List<CourseNoteDTO> allCourseNote = courseService.getAllCourseNote();
+    @PostMapping()
+    public BaseResponse<List<CourseNoteDTO>> getAllCourseNote(@RequestBody UserIdRequest req) {
+        Long userId = req.getUserId();
+        System.out.println(userId);
+        List<CourseNoteDTO> allCourseNote = courseService.getAllCourseNote(userId);
         if (allCourseNote.isEmpty()) {
             return ResultUtils.error(ErrorCode.NULL_ERROR);
         }

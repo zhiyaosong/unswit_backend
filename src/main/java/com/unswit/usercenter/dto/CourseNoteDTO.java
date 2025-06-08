@@ -16,8 +16,6 @@ public class CourseNoteDTO {
 
     private String toolTip;
 
-    private Integer enrollTerm;
-
     private List<Note> noteList;
 
 

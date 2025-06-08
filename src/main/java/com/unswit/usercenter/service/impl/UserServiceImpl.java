@@ -6,13 +6,10 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
-import com.unswit.usercenter.model.domain.request.UserLoginRequest;
 import com.unswit.usercenter.service.UserService;
 import com.unswit.usercenter.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -73,10 +70,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (user.getIsDelete()==1) {
-            throw new BusinessException("用户已被删除",50001,"");
+            throw new BusinessException("用户已被删除",50001,"用户已被删除");
         }
         if (user.getUserStatus()==1) {
-            throw new BusinessException("用户被封号",50002,"");
+            throw new BusinessException("用户被封号",50002,"用户被封号");
         }
         User safetyUser = getSafetyUser(user);
         return safetyUser;

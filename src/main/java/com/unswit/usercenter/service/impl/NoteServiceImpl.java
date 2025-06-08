@@ -1,20 +1,28 @@
 package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.dto.CourseNoteDTO;
+import com.unswit.usercenter.dto.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;
+import com.unswit.usercenter.mapper.CourseMapper;
+import com.unswit.usercenter.model.domain.Course;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
+import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
 * @author zhiyao
@@ -31,34 +39,56 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     @Resource
     private NoteMapper noteMapper;
 
+    @Resource
+    private CourseMapper courseMapper;
+
+    @Resource
+    private CourseService courseService;
+
 
     @Override
-    public List<Note> getAllNotes(User user) {
-        //取出用户的会员状态
-        Integer userRole = user.getUserRole();
-        List<Note> notes;
+    public List<CourseNoteDTO> addNote(NoteRequestDTO noteDTO, Long userId) {
 
-        QueryWrapper<Note> notesWrapper = new QueryWrapper<>();
-        if (userRole == 2) {
-            // 非会员：只查看官方笔记（isOfficial = 0)
-            notesWrapper.eq("isOfficial", 0);
-            notes = noteMapper.selectList(notesWrapper);
-        } else {
-            // 会员和管理员：查看全部笔记
-            notes = noteMapper.selectList(notesWrapper);
-        }
-        return notes;
-    }
-
-    @Override
-    public List<Note> addNote(Note note, User user) {
-        if (note == null || user == null) {
+        if (noteDTO == null) {
             // 这里你可以选择抛异常，也可以返回一个空列表
+            System.out.println("note为空");
             return Collections.emptyList();
         }
-        note.setUserId(user.getId());
-        save(note);
-        return getAllNotes(user);
+        // 设置note.
+        //   title; // 笔记名称
+        //   author; // 笔记作者名称
+        //   code; // 课程代码
+        //   lecturer;  // leaturer名字
+        //   link;  // 笔记链接
+        //   useId
+        Note note = new Note();
+        // 这里用的是Spring的BeanUtils
+        BeanUtils.copyProperties(noteDTO, note);
+        note.setUserId(userId);
+        // 设置note.enrollTime
+        String enrollTime = noteDTO.getEnrollYear()+noteDTO.getEnrollTerm();
+        note.setEnrollTime(enrollTime);
+        // 设置note.CourseId
+        // 根据 code 查 courseId，如果不存在就抛异常
+        Long courseId = Optional.ofNullable(
+                        courseMapper.selectOne(
+                                Wrappers.<Course>lambdaQuery()
+                                        .select(Course::getId)
+                                        .eq(Course::getCode, noteDTO.getCode())
+                        )
+                )
+                .map(Course::getId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.SYSTEM_ERROR, ("课程不存在: " + noteDTO.getCode())));
+        note.setCourseId(courseId);
+
+
+        try{
+            save(note);
+        }catch (BusinessException e){
+            return Collections.emptyList();
+        }
+        System.out.println("保存note成功");
+        return courseService.getAllCourseNote(userId);
     }
 
     @Transactional
