@@ -1,5 +1,6 @@
 package com.unswit.usercenter.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -32,7 +33,8 @@ public class Note {
 
     private Date updateTime;
 
-    private Integer isDelete;
+    @TableLogic
+    private Integer isDelete;  // 默认0，未删除
 
     private Integer isOfficial;
 }

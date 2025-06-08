@@ -31,7 +31,7 @@ public class User {
 
     private String email;
 
-    private String selfDescription;
+    private String signature;
 
     private Integer userStatus;
 

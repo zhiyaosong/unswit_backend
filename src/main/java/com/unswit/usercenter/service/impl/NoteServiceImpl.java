@@ -8,6 +8,7 @@ import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.dto.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.CourseMapper;
+import com.unswit.usercenter.mapper.UserMapper;
 import com.unswit.usercenter.model.domain.Course;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
@@ -16,6 +17,7 @@ import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +46,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
 
     @Resource
     private CourseService courseService;
+    @Autowired
+    private UserMapper userMapper;
 
 
     @Override
@@ -80,8 +84,16 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
                 .map(Course::getId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SYSTEM_ERROR, ("课程不存在: " + noteDTO.getCode())));
         note.setCourseId(courseId);
-
-
+        // 设置note.isOfficial和isChecked(官方默认被检查)
+        User user = userService.getById(userId);
+        int userRole = user.getUserRole();
+        // 0管理员，1会员，2非会员
+        if (userRole==0){
+            // 0未审核 1审核通过
+            note.setIsChecked(1);
+            // 0官方 1非官方
+            note.setIsOfficial(0);
+        }
         try{
             save(note);
         }catch (BusinessException e){

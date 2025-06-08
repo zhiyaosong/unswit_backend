@@ -32,8 +32,6 @@ public interface UserService extends IService<User> {
      */
     User getSafetyUser(User originUser);
 
-
-
     /**
      * 用户注销
      *
@@ -41,4 +39,6 @@ public interface UserService extends IService<User> {
      * @return
      */
     int userLogout(HttpServletRequest request, String token);
+
+
 }
