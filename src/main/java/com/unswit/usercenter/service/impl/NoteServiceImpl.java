@@ -91,8 +91,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         if (userRole==0){
             // 0未审核 1审核通过
             note.setIsChecked(1);
-            // 0官方 1非官方
-            note.setIsOfficial(0);
+            // 0非官方 1官方
+            note.setIsOfficial(1);
         }
         try{
             save(note);
