@@ -69,6 +69,12 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         // 这里用的是Spring的BeanUtils
         BeanUtils.copyProperties(noteDTO, note);
         note.setUserId(userId);
+
+        User user = userService.getById(userId);
+        // 设置note.author
+        if(note.getAuthor() == null){
+            note.setAuthor(user.getUserName());
+        }
         // 设置note.enrollTime
         String enrollTime = noteDTO.getEnrollYear()+noteDTO.getEnrollTerm();
         note.setEnrollTime(enrollTime);
@@ -85,7 +91,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
                 .orElseThrow(() -> new BusinessException(ErrorCode.SYSTEM_ERROR, ("课程不存在: " + noteDTO.getCode())));
         note.setCourseId(courseId);
         // 设置note.isOfficial和isChecked(官方默认被检查)
-        User user = userService.getById(userId);
+
         int userRole = user.getUserRole();
         // 0管理员，1会员，2非会员
         if (userRole==0){
