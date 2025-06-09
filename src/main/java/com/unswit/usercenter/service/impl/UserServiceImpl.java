@@ -206,7 +206,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                             return fieldValue.toString();
                         }));
 
-        //3.存储
+        // 将token作为key
         String tokenKey = LOGIN_USER_KEY+token;
         try{
             stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);
@@ -217,7 +217,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw cce;
         }
 
-        // 3. 维护用户的 token 列表
+        // 3. 维护用户的 token 列表，只有一个作用：控制单个用户的token数量
         String userSessionsKey = "user_sessions:" + user.getId();
         System.out.println("userSessionsKey:" + userSessionsKey);
         final int MAX_SESSIONS = 3;
@@ -248,12 +248,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         System.out.println("返回token给客户端");
         //return Result.ok(token);
         return token;
-
-//        // 3. 用户脱敏
-//        User safetyUser = getSafetyUser(user);
-//        // 4. 记录用户的登录态
-//        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
-//        return safetyUser;
     }
 
     /**
