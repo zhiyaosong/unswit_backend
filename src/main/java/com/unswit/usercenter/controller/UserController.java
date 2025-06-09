@@ -59,7 +59,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+    public BaseResponse<String> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         // 校验
         if (userRegisterRequest == null) {
             System.out.println("请求为空");
@@ -79,15 +79,15 @@ public class UserController {
          *       -1: "密码和校验密码不相同"，
          *       -3: "数据存入失败"}
          */
-        long result = userService.userRegister(userName, userAccount, userPassword, checkPassword);
-        if (result == -1 || result == -2) {
-            System.out.println("账户不符合，两次密码不一致");
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        if (result == -3) {
-            System.out.println("存入失败");
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-        }
+        String result = userService.userRegister(userName, userAccount, userPassword, checkPassword);
+//        if (result == -1 || result == -2) {
+//            System.out.println("账户不符合，两次密码不一致");
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        if (result == -3) {
+//            System.out.println("存入失败");
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+//        }
         return ResultUtils.success(result);
     }
 

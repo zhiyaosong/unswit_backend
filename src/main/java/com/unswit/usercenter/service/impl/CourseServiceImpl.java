@@ -35,7 +35,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
     private NoteMapper noteMapper;
 
     @Override
-    public List<CourseNoteDTO> getAllCourseNote(Long userId) {
+    public List<CourseNoteDTO> getAllCourseNote(String userId) {
         // 查询所有课程
         QueryWrapper<Course> courseWrapper = new QueryWrapper<>();
         List<Course> courses = courseMapper.selectList(courseWrapper);

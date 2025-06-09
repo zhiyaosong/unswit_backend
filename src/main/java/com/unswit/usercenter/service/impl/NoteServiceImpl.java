@@ -51,7 +51,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
 
 
     @Override
-    public List<CourseNoteDTO> addNote(NoteRequestDTO noteDTO, Long userId) {
+    public List<CourseNoteDTO> addNote(NoteRequestDTO noteDTO, String userId) {
 
         if (noteDTO == null) {
             // 这里你可以选择抛异常，也可以返回一个空列表
@@ -124,7 +124,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"笔记审核失败");
         }
         // 3. 审核通过后，同步升级该笔记所属用户的 Role
-        Long userId = note.getUserId();
+        String userId = note.getUserId();
         // 先查询用户当前状态，如果不是会员再更新
         User user = userService.getById(userId);
         if (user != null && (user.getUserRole() == 2)) {

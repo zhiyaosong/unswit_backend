@@ -18,7 +18,7 @@ import java.util.List;
 */
 public interface NoteService extends IService<Note> {
 
-    List<CourseNoteDTO> addNote(NoteRequestDTO note, Long userId);
+    List<CourseNoteDTO> addNote(NoteRequestDTO note, String userId);
 
 //    List<Note> getAllNotes(User user);
 

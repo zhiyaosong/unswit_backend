@@ -26,7 +26,7 @@ public class CourseController {
      */
     @PostMapping()
     public BaseResponse<List<CourseNoteDTO>> getAllCourseNote(@RequestBody UserIdRequest req) {
-        Long userId = req.getUserId();
+        String userId = req.getUserId();
         System.out.println(userId);
         List<CourseNoteDTO> allCourseNote = courseService.getAllCourseNote(userId);
         if (allCourseNote.isEmpty()) {

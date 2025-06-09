@@ -1,10 +1,7 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.unswit.usercenter.model.domain.request.UserLoginRequest;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,7 +13,7 @@ public interface UserService extends IService<User> {
 
     User getUserByToken(String token);
 
-    long userRegister(String userName, String userAccount, String userPassword, String checkPassword);
+    String userRegister(String userName, String userAccount, String userPassword, String checkPassword);
 
     /**
      * 用户登录

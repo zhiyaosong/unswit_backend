@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -27,9 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
 import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
 import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
 
@@ -64,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         UserDTO userDTO = BeanUtil.mapToBean(userMap, UserDTO.class, true);
         System.out.println(userDTO);
         // 校验用户是否合法
-        Long userId = userDTO.getId();
+        String userId = userDTO.getId();
         User user = userMapper.selectById(userId);
         if (user==null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -85,15 +82,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @param userAccount   用户账户
      * @param userPassword  用户密码
      * @param checkPassword 校验密码
-     * @return
-     * success: 新用户id
+     * @return success: 新用户id
      * error:
-     *      {-2: "账户不是由字母、数字和下划线组成",
-     *       -1: "密码和校验密码不相同"，
-     *       -3: "数据存入失败"}
+     * {-2: "账户不是由字母、数字和下划线组成",
+     * -1: "密码和校验密码不相同"，
+     * -3: "数据存入失败"}
      */
     @Override
-    public long userRegister(String userName, String userAccount, String userPassword, String checkPassword) {
+    public String userRegister(String userName, String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
         // 这个在controller层已经校验过了
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
@@ -110,12 +106,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String validPattern = "^[a-zA-Z0-9_]+$";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (!matcher.matches()) {
-            return -2;
+            return "账户名称格式错误！";
         }
         // 密码和校验密码不相同
         // 前端表单自带校验，但是要防止爬虫之类的
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            return "密码和校验密码不相同！";
         }
         // 账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -142,9 +138,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         boolean saveResult = this.save(user);
         if (!saveResult) {
-            return -3;
+            return "保存失败！";
         }
         System.out.println("返回Id");
+
         return user.getId();
     }
 

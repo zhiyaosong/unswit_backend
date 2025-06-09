@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 public class Note {
     private Long id;
-    private Long userId;
+    private String userId;
     // NoteRequestDTO中的字段:
     private String title;
     private String author;

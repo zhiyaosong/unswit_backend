@@ -26,7 +26,7 @@ public class NoteController {
     public BaseResponse<List<CourseNoteDTO>> addNote(@RequestBody AddNoteRequestDTO req) {
         NoteRequestDTO note = req.getNote();
 
-        Long userId = req.getUserId();
+        String userId = req.getUserId();
 
         List<CourseNoteDTO> notes = noteService.addNote(note, userId);
         return ResultUtils.success(notes);

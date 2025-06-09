@@ -14,8 +14,8 @@ import java.util.Date;
 @TableName(value ="user")
 @Data
 public class User {
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId(type = IdType.ASSIGN_UUID)
+    private String id;
 
     private String userName;
 
