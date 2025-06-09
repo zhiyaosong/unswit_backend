@@ -1,11 +1,11 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.CourseNoteDTO;
+import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.model.domain.Course;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.unswit.usercenter.model.domain.User;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author zhiyao
@@ -15,5 +15,5 @@ import java.util.List;
 public interface CourseService extends IService<Course> {
 
 
-    List<CourseNoteDTO> getAllCourseNote(Long userId);
+    Map<String, CategoryCourseDTO> getAllCourseNote(Long userId);
 }

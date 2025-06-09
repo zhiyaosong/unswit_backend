@@ -3,7 +3,7 @@ package com.unswit.usercenter.controller;
 import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
-import com.unswit.usercenter.dto.CourseNoteDTO;
+import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.dto.AddNoteRequestDTO;
 import com.unswit.usercenter.dto.NoteRequestDTO;
 import com.unswit.usercenter.service.NoteService;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/note")
@@ -23,12 +24,12 @@ public class NoteController {
      */
 
     @PostMapping("add")
-    public BaseResponse<List<CourseNoteDTO>> addNote(@RequestBody AddNoteRequestDTO req) {
+    public BaseResponse<Map<String, CategoryCourseDTO>> addNote(@RequestBody AddNoteRequestDTO req) {
         NoteRequestDTO note = req.getNote();
 
         Long userId = req.getUserId();
 
-        List<CourseNoteDTO> notes = noteService.addNote(note, userId);
+        Map<String, CategoryCourseDTO> notes = noteService.addNote(note, userId);
         return ResultUtils.success(notes);
     }
 

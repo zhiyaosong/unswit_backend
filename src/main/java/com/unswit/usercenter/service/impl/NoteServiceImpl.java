@@ -1,10 +1,9 @@
 package com.unswit.usercenter.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.dto.CourseNoteDTO;
+import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.dto.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.CourseMapper;
@@ -22,8 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,12 +49,12 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
 
 
     @Override
-    public List<CourseNoteDTO> addNote(NoteRequestDTO noteDTO, Long userId) {
+    public Map<String, CategoryCourseDTO> addNote(NoteRequestDTO noteDTO, Long userId) {
 
         if (noteDTO == null) {
             // 这里你可以选择抛异常，也可以返回一个空列表
             System.out.println("note为空");
-            return Collections.emptyList();
+            return null;
         }
         // 设置note.
         //   title; // 笔记名称
@@ -103,9 +101,14 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         try{
             save(note);
         }catch (BusinessException e){
-            return Collections.emptyList();
+            return null;
         }
         System.out.println("保存note成功");
+        if (user.getUserRole()==2){
+            user.setUserRole(1);
+            userMapper.updateById(user);
+            System.out.println("更改为会员");
+        }
         return courseService.getAllCourseNote(userId);
     }
 
