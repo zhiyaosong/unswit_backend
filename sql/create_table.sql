@@ -15,7 +15,7 @@ drop table if exists user;
 create table if not exists `user`
 (
     userName     varchar(256)                       null comment '用户昵称',
-    id           bigint auto_increment comment 'id' primary key,
+    id           char(32) not null comment 'id,UUID（无中划线32位）' primary key,
     userAccount  varchar(256)                       null comment '账号',
     avatarUrl    varchar(1024)                      null comment '用户头像',
     gender       tinyint                            null comment '性别',
@@ -32,13 +32,15 @@ create table if not exists `user`
     isDelete     tinyint  default 0                 not null comment '是否删除'
 )comment '用户';
 
+SET @yangId = REPLACE(UUID(),'-','');
+
 # 导入示例用户
 INSERT INTO user_centre.user (
-  username, userAccount, gender, userPassword,avatarUrl,
+  username, id,userAccount, gender, userPassword,avatarUrl,
   admissionTime, email, signature, userStatus,
   createTime, updateTime, userRole
 ) VALUES (
-  '阳阳阳', 'yang', null, '1bbd886460827015e5d605ed44252251','/img/a.png',
+  '阳阳阳',  @yangId,'yang', null, '1bbd886460827015e5d605ed44252251','/img/a.png',
   '24T1', null, '我是一个热爱学习编程的学生。', 0,
   '2023-08-06 14:14:22', '2023-08-06 14:39:37', 1);
 
@@ -82,7 +84,7 @@ create table if not exists `note`
       title      varchar(512)        null comment '笔记名',
       link       varchar(512)        null comment '笔记链接',
       author     varchar(512)        not null comment '笔记作者自定义名',
-      userId     bigint              not null comment '发布者id',
+      userId     char(32)              not null comment '发布者id',
       lecturer   varchar(512)        comment '任课教师',
       isOfficial tinyint   default 0 not null comment '是否是官方笔记：0：非官方，1：官方',
       toolTip    text                comment '笔记描述',
@@ -97,24 +99,24 @@ create table if not exists `note`
       constraint fk_note_user foreign key (userId) references user(id)
 ) comment '笔记';
 
+
+
 INSERT INTO user_centre.note (
-        courseId, enrollTime, title, link, author, userId, lecturer, toolTip,isOfficial)
+    courseId, enrollTime, title, link, author, userId, lecturer, toolTip,isOfficial)
 VALUES ('1','24T1','6713官方笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','joshi','这是yang的6713笔记', '1');
+        'yang', @yangId,'joshi','这是yang的6713笔记', '1');
 
 INSERT INTO user_centre.note (
     courseId, enrollTime,title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('1','25T1','6713非官方笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','XXX','这是yang的6713笔记2号', '0');
+        'yang', @yangId,'XXX','这是yang的6713笔记2号', '0');
 
 INSERT INTO user_centre.note (
     courseId, title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('2','9417笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','9417-lecturer','这是yang的9417笔记', '1');
+        'yang', @yangId,'9417-lecturer','这是yang的9417笔记', '1');
 
 INSERT INTO user_centre.note (
     courseId, title, link, author, userId, lecturer, toolTip, isOfficial)
 VALUES ('3','9101笔记','https://sudden-comic-c00.notion.site/1f1f45253452809daeaad72fceb2146f?v=1f1f45253452806fb07b000ce212e8c5&pvs=4',
-        'yang','1','9101-lecturer','这是yang的9101笔记', '1');
-
-
+        'yang', @yangId,'9101-lecturer','这是yang的9101笔记', '1');

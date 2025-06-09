@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,7 +26,7 @@ public class CourseController {
      */
     @PostMapping()
     public BaseResponse<Map<String, CategoryCourseDTO>> getAllCourseNote(@RequestBody UserIdRequest req) {
-        Long userId = req.getUserId();
+        String userId = req.getUserId();
         System.out.println(userId);
         Map<String, CategoryCourseDTO> allCourseNote = courseService.getAllCourseNote(userId);
         if (allCourseNote.isEmpty()) {

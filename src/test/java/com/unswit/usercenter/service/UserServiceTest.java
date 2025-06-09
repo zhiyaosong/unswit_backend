@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 
 /**
  * 用户服务测试
@@ -41,7 +42,7 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser() {
         User user = new User();
-        user.setId(1L);
+        user.setId(UUID.randomUUID().toString());
         user.setUserName("yy");
         user.setUserAccount("123");
         user.setAvatarUrl("https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png");
