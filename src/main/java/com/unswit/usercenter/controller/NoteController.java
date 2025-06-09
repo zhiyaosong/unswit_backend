@@ -6,6 +6,7 @@ import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.dto.AddNoteRequestDTO;
+import com.unswit.usercenter.dto.CourseNoteDTO;
 import com.unswit.usercenter.dto.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.NoteMapper;
@@ -55,7 +56,7 @@ public class NoteController {
         }
     }
     @DeleteMapping("delete/{id}")
-    public  List<CourseNoteDTO> deleteNote(@PathVariable long id) {
+    public  Map<String, CategoryCourseDTO> deleteNote(@PathVariable long id) {
         String userId = UserHolder.getUser().getId();
         int rows = noteMapper.deleteById(id);
         if (rows == 0) {
@@ -71,7 +72,7 @@ public class NoteController {
      * @return List<CourseNoteDTO>
      */
     @PatchMapping("/update/{id}")
-    public List<CourseNoteDTO> patchNote(
+    public Map<String, CategoryCourseDTO> patchNote(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
         String userId = UserHolder.getUser().getId();

@@ -80,14 +80,7 @@ public class UserController {
          *       -3: "数据存入失败"}
          */
         String result = userService.userRegister(userName, userAccount, userPassword, checkPassword);
-//        if (result == -1 || result == -2) {
-//            System.out.println("账户不符合，两次密码不一致");
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        if (result == -3) {
-//            System.out.println("存入失败");
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-//        }
+
         return ResultUtils.success(result);
     }
 
@@ -124,10 +117,7 @@ public class UserController {
 //        cookie.setSecure(true);                         // 生产环境强制 HTTPS
         cookie.setPath("/");                             // 整个域名下都带该 Cookie
         cookie.setMaxAge((int) TimeUnit.MINUTES.toSeconds(30)); // 30 分钟过期
-        // 如果需要 SameSite，可用 Spring Boot 2.7+ 的 ResponseCookie
-        // ResponseCookie rc = ResponseCookie.from("access_token", token)
-        //         .httpOnly(true).secure(true).path("/").maxAge(30 * 60).sameSite("Lax").build();
-        // response.addHeader(HttpHeaders.SET_COOKIE, rc.toString());
+
         response.addCookie(cookie);
         System.out.println("已加入cookie");
         return ResultUtils.success("ok");

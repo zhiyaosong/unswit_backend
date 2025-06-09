@@ -15,5 +15,5 @@ import java.util.Map;
 public interface CourseService extends IService<Course> {
 
 
-    Map<String, CategoryCourseDTO> getAllCourseNote(Long userId);
+    Map<String, CategoryCourseDTO> getAllCourseNote(String userId);
 }

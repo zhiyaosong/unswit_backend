@@ -63,9 +63,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
         return grouped;
     }
 
-
     @Override
-    public Map<String, CategoryCourseDTO> getAllCourseNote(Long userId) {
+    public Map<String, CategoryCourseDTO> getAllCourseNote(String userId) {
         // 查询所有课程
         QueryWrapper<Course> courseWrapper = new QueryWrapper<>();
         List<Course> courses = courseMapper.selectList(courseWrapper);
