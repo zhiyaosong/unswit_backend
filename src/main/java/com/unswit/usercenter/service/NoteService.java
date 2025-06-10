@@ -1,7 +1,7 @@
 package com.unswit.usercenter.service;
 
 import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.NoteRequestDTO;
+import com.unswit.usercenter.dto.request.NoteRequestDTO;
 import com.unswit.usercenter.model.domain.Note;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -21,4 +21,8 @@ public interface NoteService extends IService<Note> {
 //    List<Note> getAllNotes(User user);
 
     boolean auditNoteAndUpdateUser(long id);
+
+    Map<Long, Integer> getLikeCounts(List<Long> noteIds);
+
+    Map<Long, Boolean> getUserLikedStatus(String userId, List<Long> noteIds);
 }

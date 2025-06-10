@@ -1,5 +1,6 @@
 package com.unswit.usercenter.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.Date;
 @TableName(value ="note")
 @Data
 public class Note {
+    @TableId
     private Long id;
     private String userId;
     // NoteRequestDTO中的字段:
@@ -23,7 +25,7 @@ public class Note {
     // courseCode => courseId
     private Long courseId;
 
-    private String toolTip;  //暂时不用
+    private String toolTip;
 
     private Integer noteStatus; // 默认正常
 
@@ -37,4 +39,6 @@ public class Note {
     private Integer isDelete;  // 默认0，未删除
 
     private Integer isOfficial;
+
+    private Integer likeCount;
 }

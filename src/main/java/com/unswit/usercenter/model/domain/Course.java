@@ -1,5 +1,6 @@
 package com.unswit.usercenter.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.Data;
 @TableName(value ="course")
 @Data
 public class Course {
+    @TableId
     private Long id;
 
     private String code;

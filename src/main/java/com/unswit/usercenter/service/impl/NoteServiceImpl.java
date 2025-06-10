@@ -1,16 +1,19 @@
 package com.unswit.usercenter.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.NoteRequestDTO;
+import com.unswit.usercenter.dto.request.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.CourseMapper;
 import com.unswit.usercenter.mapper.UserMapper;
+import com.unswit.usercenter.mapper.UserNoteLikesMapper;
 import com.unswit.usercenter.model.domain.Course;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
+import com.unswit.usercenter.model.domain.UserNoteLikes;
 import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.mapper.NoteMapper;
@@ -21,8 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
 * @author zhiyao
@@ -43,7 +47,11 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     private CourseMapper courseMapper;
 
     @Resource
+    private UserNoteLikesMapper userNoteLikesMapper;
+
+    @Resource
     private CourseService courseService;
+
     @Autowired
     private UserMapper userMapper;
 
@@ -137,9 +145,47 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
             userService.updateById(updateUser);
         }
         // 如果用户已经是会员，就不重复执行 update 语句
-
         return true;
+    }
 
+    /** 获取每个笔记的总点赞数 */
+    @Override
+    public Map<Long, Integer> getLikeCounts(List<Long> noteIds) {
+        // MyBatis-Plus 内置的 selectBatchIds
+        List<Note> notes = noteMapper.selectBatchIds(noteIds);
+        // 转成 Map<id, likeCount>
+        return notes.stream()
+                .collect(Collectors.toMap(
+                        Note::getId,
+                        Note::getLikeCount,
+                        (a, b) -> a  // 不会重复
+                ));
+    }
+
+    /** 查询 user_note_likes 表，看哪些记录存在 */
+    @Override
+    public Map<Long, Boolean> getUserLikedStatus(String userId, List<Long> noteIds){
+
+        if (noteIds == null || noteIds.isEmpty() || userId == null) {
+            return Collections.emptyMap();
+        }
+        // 用 QueryWrapper 限定 userId 和 noteIds
+        List<UserNoteLikes> likedList = userNoteLikesMapper.selectList(
+                new QueryWrapper<UserNoteLikes>()
+                        .eq("userId", userId)
+                        .in("noteId", noteIds)
+                        .select("noteId")  // 只查询 note_id
+        );
+        Set<Long> likedSet = likedList.stream()
+                .map(UserNoteLikes::getNoteId)
+                .collect(Collectors.toSet());
+
+        // 构造返回
+        return noteIds.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        likedSet::contains
+                ));
     }
 }
 

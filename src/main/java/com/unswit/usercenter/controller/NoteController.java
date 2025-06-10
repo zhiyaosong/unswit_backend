@@ -4,15 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.unswit.usercenter.common.BaseResponse;
 import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
-import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.AddNoteRequestDTO;
-import com.unswit.usercenter.dto.CourseNoteDTO;
-import com.unswit.usercenter.dto.NoteRequestDTO;
+import com.unswit.usercenter.dto.*;
+import com.unswit.usercenter.dto.request.AddNoteRequestDTO;
+import com.unswit.usercenter.dto.request.NoteLikeRequestDTO;
+import com.unswit.usercenter.dto.request.NoteRequestDTO;
+import com.unswit.usercenter.dto.request.ToggleLikeRequestDTO;
+import com.unswit.usercenter.dto.response.NoteLikeResponseDTO;
+import com.unswit.usercenter.dto.response.ToggleLikeResponseDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
+import com.unswit.usercenter.service.UserNoteLikesService;
 import com.unswit.usercenter.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,10 @@ public class NoteController {
 
     @Resource
     private CourseService courseService;
+
+    @Resource
+    private UserNoteLikesService userNoteLikesService;
+
     @Autowired
     private NoteMapper noteMapper;
 
@@ -93,4 +101,44 @@ public class NoteController {
         }
         return courseService.getAllCourseNote(userId);
     }
+
+    /**
+     * BaseResponse<String> likeNote 获取笔记点赞信息
+     * @param req
+     * @return NoteLikesResponseDTO
+     */
+    @PostMapping("likes")
+    public BaseResponse<NoteLikeResponseDTO> getLikes(@RequestBody NoteLikeRequestDTO req) {
+        System.out.println("进入likes逻辑");
+        String userId = req.getUserId();
+        List<Long> noteIds = req.getNoteIds();
+        if (userId == null || noteIds == null || noteIds.isEmpty()) {
+            return ResultUtils.error(ErrorCode.NULL_ERROR);
+        }
+        // 1. 查询总点赞数
+        Map<Long, Integer> likes = noteService.getLikeCounts(noteIds);
+        // 2. 查询当前用户是否已点赞
+        Map<Long, Boolean> likedByUser = noteService.getUserLikedStatus(userId, noteIds);
+
+        // 3. 组装返回
+        NoteLikeResponseDTO resp = new NoteLikeResponseDTO();
+        resp.setLikes(likes);
+        resp.setLikedByUser(likedByUser);
+        System.out.println("resp = " + resp);
+        return ResultUtils.success(resp);
+    }
+
+    /**
+     * 切换点赞（如果之前已点赞则取消，否则就点赞）。
+     * POST /api/note/like?userId=xxx
+     * Body: { "noteId": 123 }
+     */
+    @PostMapping("/like")
+    public BaseResponse<ToggleLikeResponseDTO> toggleLike(
+            @RequestBody ToggleLikeRequestDTO req
+    ) {
+        ToggleLikeResponseDTO resp = userNoteLikesService.toggleLike(req);
+        return ResultUtils.success(resp);
+    }
 }
+

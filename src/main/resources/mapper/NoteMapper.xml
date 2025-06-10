@@ -20,11 +20,12 @@
             <result property="isDelete" column="isDelete" />
             <result property="userId" column="userId" />
             <result property="isOfficial" column="isOfficial" />
+            <result property="likeCount" column="likeCount" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,courseId,title,link,author,lecturer,enrollTime,
         toolTip,noteStatus,isChecked,createTime,updateTime,
-        isDelete,userId,isOfficial
+        isDelete,userId,isOfficial,likeCount
     </sql>
 </mapper>

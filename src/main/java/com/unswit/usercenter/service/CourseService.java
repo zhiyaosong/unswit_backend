@@ -4,7 +4,6 @@ import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.model.domain.Course;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
 import java.util.Map;
 
 /**

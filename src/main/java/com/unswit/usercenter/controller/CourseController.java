@@ -6,7 +6,7 @@ import com.unswit.usercenter.common.ErrorCode;
 import com.unswit.usercenter.common.ResultUtils;
 import com.unswit.usercenter.dto.CategoryCourseDTO;
 
-import com.unswit.usercenter.dto.UserIdRequest;
+import com.unswit.usercenter.dto.request.UserIdRequest;
 import com.unswit.usercenter.service.CourseService;
 
 import org.springframework.web.bind.annotation.*;
