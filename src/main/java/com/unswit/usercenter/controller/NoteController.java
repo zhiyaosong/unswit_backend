@@ -27,6 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/note")
+@CrossOrigin(origins = {"http://localhost:3000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
 public class NoteController {
     @Resource
     private NoteService noteService;

@@ -86,6 +86,7 @@ CREATE TABLE user_note_likes
 ) comment '用户笔记点赞表';
 
 # mysql的触发器，自动更新note.likeCount
+DELIMITER $$
 CREATE TRIGGER trg_like_insert
     AFTER INSERT ON user_note_likes
     FOR EACH ROW
@@ -93,7 +94,7 @@ BEGIN
     UPDATE note
     SET likeCount = likeCount + 1
     WHERE id = NEW.noteId;
-END;
+END$$
 
 CREATE TRIGGER trg_like_delete
     AFTER DELETE ON user_note_likes
@@ -102,7 +103,8 @@ BEGIN
     UPDATE note
     SET likeCount = likeCount - 1
     WHERE id = OLD.noteId;
-END;
+END$$
+DELIMITER ;
 
 # 这个在点赞功能不需要
 # CREATE TRIGGER trg_like_update
