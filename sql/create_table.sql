@@ -85,6 +85,10 @@ CREATE TABLE user_note_likes
      FOREIGN KEY (noteId) REFERENCES note(id)
 ) comment '用户笔记点赞表';
 
+
+
+
+
 # 帖子表
 create table if not exists `blog`
 (
@@ -119,13 +123,6 @@ CREATE TABLE `blog_comments`
      foreign key(parent_id) references blog_comments(id)
          on delete cascade
 )comment 'blog comments' ;
-
-
-
-
-
-
-
 
 
 # mysql的触发器，自动更新note.likeCount
