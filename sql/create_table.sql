@@ -11,6 +11,8 @@ drop table if exists user_note_likes;
 drop table if exists note;
 drop table if exists course;
 drop table if exists user;
+drop table if exists blog_comments;
+drop table if exists blog;
 
 # 用户表
 create table if not exists `user`
@@ -75,7 +77,7 @@ create table if not exists `note`
       constraint fk_note_user foreign key (userId) references user(id)
 ) comment '笔记';
 
-CREATE TABLE user_note_likes
+create table if not exists user_note_likes
 (
      userId          char(32)              NOT NULL,
      noteId          BIGINT                NOT NULL,
@@ -85,47 +87,7 @@ CREATE TABLE user_note_likes
      FOREIGN KEY (noteId) REFERENCES note(id)
 ) comment '用户笔记点赞表';
 
-
-
-
-
-# 帖子表
-create table if not exists `blog`
-(
-    id         bigint auto_increment primary key comment '帖子id',
-    userId     char(32)  not null comment 'id,UUID（无中划线32位）' ,
-    title varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null comment '标题',
-    images varchar(2048) character set utf8mb4 collate utf8mb4_general_ci  comment '帖子照片，最多9张，多张以","隔开',
-    content varchar(2048) character set utf8mb4 collate utf8mb4_unicode_ci not null comment '帖子内容',
-    liked int(8) unsigned null default 0 comment '点赞数量',
-    comments int(8) unsigned null default null comment '评论数量',
-    createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
-    updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    isDelete     tinyint  default 0                 not null comment '是否删除',
-    FOREIGN KEY (userId) REFERENCES user(id)
-)comment '帖子';
-
-
-# blog comments
-CREATE TABLE `blog_comments`
-(
-     id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-     userId     char(32)  not null comment 'id,UUID（无中划线32位）' ,
-     blog_id bigint  NOT NULL COMMENT 'blog_id',
-     parent_id bigint(20) UNSIGNED NOT NULL COMMENT '关联的1级评论id，如果是一级评论，则值为0',
-     content varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
-     status tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
-     create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-     update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-     PRIMARY KEY (id) USING BTREE,
-     FOREIGN KEY (userId) REFERENCES user(id),
-     FOREIGN KEY (blog_id) REFERENCES blog(id),
-     foreign key(parent_id) references blog_comments(id)
-         on delete cascade
-)comment 'blog comments' ;
-
-
-# mysql的触发器，自动更新note.likeCount
+# 自动更新note.likeCount的触发器
 DELIMITER $$
 CREATE TRIGGER trg_like_insert
     AFTER INSERT ON user_note_likes
@@ -146,16 +108,91 @@ BEGIN
 END$$
 DELIMITER ;
 
-# 这个在点赞功能不需要
-# CREATE TRIGGER trg_like_update
-#     AFTER UPDATE ON user_note_likes
-#     FOR EACH ROW
-# BEGIN
-#     IF NEW.noteId <> OLD.noteId THEN
-#         UPDATE note SET likeCount = likeCount - 1 WHERE id = OLD.noteId;
-#         UPDATE note SET likeCount = likeCount + 1 WHERE id = NEW.noteId;
-#     END IF;
-# END;
+
+# 帖子表
+create table if not exists `blog`
+(
+    id           bigint auto_increment primary key comment '帖子id',
+    userId       char(32)      not null comment 'id,UUID（无中划线32位）' ,
+    title        varchar(255)  character set utf8mb4 collate utf8mb4_unicode_ci not null comment '标题',
+    images       varchar(2048) character set utf8mb4 collate utf8mb4_general_ci  comment '帖子照片，最多9张，多张以","隔开',
+    content      varchar(2048) character set utf8mb4 collate utf8mb4_unicode_ci not null comment '帖子内容',
+    likeCount    int(8) unsigned null default 0 comment '点赞数量',
+    commentCount     int(8) unsigned null default null comment '评论数量',
+    status       tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
+
+    createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
+    updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    isDelete     tinyint  default 0                 not null comment '是否删除',
+    FOREIGN KEY (userId) REFERENCES user(id)
+)comment '帖子';
+
+# blog comments
+CREATE TABLE if not exists `blog_comments`
+(
+    id           bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    userId       char(32)  not null comment 'id,UUID（无中划线32位）' ,
+    blogId      bigint  NOT NULL COMMENT 'blog_id',
+    parentId    bigint(20) UNSIGNED NOT NULL COMMENT '关联的1级评论id，如果是一级评论，则值为0',
+    content      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
+    status       tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
+    createTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updateTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id) USING BTREE,
+    FOREIGN KEY (userId) REFERENCES user(id),
+    FOREIGN KEY (blogId) REFERENCES blog(id),
+    foreign key (parentId) references blog_comments(id) on delete cascade
+)comment 'blog comments' ;
+
+create table if not exists user_blog_likes
+(
+    userId          char(32)              NOT NULL,
+    blogId          BIGINT                NOT NULL,
+    likedAt         TIMESTAMP   DEFAULT   CURRENT_TIMESTAMP,
+    PRIMARY KEY (userId, blogId),
+    FOREIGN KEY (userId) REFERENCES user(id),
+    FOREIGN KEY (blogId) REFERENCES blog(id)
+) comment '用户帖子点赞表';
+
+# blog.likeCount的触发器
+DELIMITER $$
+CREATE TRIGGER trg_blog_like_insert
+    AFTER INSERT ON user_blog_likes
+    FOR EACH ROW
+BEGIN
+    UPDATE blog
+    SET likeCount = likeCount + 1
+    WHERE id = NEW.blogId;
+END$$
+
+CREATE TRIGGER trg_blog_like_delete
+    AFTER DELETE ON user_blog_likes
+    FOR EACH ROW
+BEGIN
+    UPDATE blog
+    SET likeCount = likeCount - 1
+    WHERE id = OLD.blogId;
+END$$
+
+# blog.commentCount的触发器
+CREATE TRIGGER trg_blog_comment_insert
+    AFTER INSERT ON blog_comments
+    FOR EACH ROW
+BEGIN
+    UPDATE blog
+    SET commentCount = commentCount + 1
+    WHERE id = NEW.blogId;
+END$$
+
+CREATE TRIGGER trg_blog_comment_delete
+    AFTER DELETE ON blog_comments
+    FOR EACH ROW
+BEGIN
+    UPDATE blog
+    SET commentCount = commentCount - 1
+    WHERE id = OLD.blogId;
+END$$
+DELIMITER ;
 
 
 # 导入示例用户

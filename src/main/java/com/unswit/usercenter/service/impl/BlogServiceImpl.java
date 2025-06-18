@@ -25,7 +25,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Override
-    public Result likeBolog(Long id) {
+    public Result likeBlog(Long id) {
         //1.获取登陆用户
         String userId = UserHolder.getUser().getId();
 

@@ -42,12 +42,17 @@ public class Blog {
     /**
      * 点赞数量
      */
-    private Integer liked;
+    private Integer likeCount;
 
     /**
      * 评论数量
      */
-    private Integer comments;
+    private Integer commentCount;
+
+    /**
+     * 状态，0：正常，1：被举报，2：禁止查看
+     */
+    private Integer status;
 
     /**
      * 创建时间
@@ -55,7 +60,7 @@ public class Blog {
     private Date createTime;
 
     /**
-     * 
+     *
      */
     private Date updateTime;
 

@@ -58,7 +58,7 @@ public class BlogController {
      */
     @PutMapping("/like/{id}")
     public Result likeBlog(@PathVariable("id") Long id) {
-        return blogService.likeBolog(id);
+        return blogService.likeBlog(id);
     }
 
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unswit.usercenter.mapper.BlogCommentsMapper">
+
+    <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.BlogComments">
+            <id property="id" column="id" />
+            <result property="userId" column="userId" />
+            <result property="blogId" column="blogId" />
+            <result property="parentId" column="parentId" />
+            <result property="content" column="content" />
+            <result property="status" column="status" />
+            <result property="createTime" column="createTime" />
+            <result property="updateTime" column="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,blogId,parentId,content,status,
+        createTime,updateTime
+    </sql>
+</mapper>
