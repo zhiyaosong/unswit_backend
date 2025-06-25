@@ -1,19 +1,8 @@
-package com.unswit.usercenter.dto.request;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.sun.istack.internal.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+package com.unswit.usercenter.vo;
 
 import java.io.Serializable;
-import java.util.Date;
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class BlogCommentRequestDTO implements Serializable {
+
+public class CommentsVO implements Serializable {
     /**
      * comment id
      */
@@ -37,13 +26,11 @@ public class BlogCommentRequestDTO implements Serializable {
     /**
      * 回复的内容
      */
-//    @NotEmpty(message = "评论内容不能为空")
     private String content;
 
     /**
      * 状态，0：正常，1：被举报，2：禁止查看
      */
     private Integer status;
-
 
 }
