@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class BlogCommentsController {
     @PostMapping
     public Result addComment(@RequestBody BlogCommentRequestDTO blogCommentRequestDTO) {
-
         return null;
     }
 
