@@ -31,7 +31,7 @@ import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:3000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -109,7 +109,7 @@ public class UserController {
 
         String token = userService.userLogin(userAccount, userPassword);
         if (Objects.equals(token, "用户为空") || Objects.equals(token, "账户不符合要求") || token == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
 
         // 2. 把 token 写进 HttpOnly Cookie

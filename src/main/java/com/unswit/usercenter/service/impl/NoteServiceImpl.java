@@ -97,6 +97,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
                 .orElseThrow(() -> new BusinessException(ErrorCode.SYSTEM_ERROR, ("课程不存在: " + noteDTO.getCode())));
         note.setCourseId(courseId);
         // 设置note.isOfficial和isChecked(官方默认被检查)
+        // TODO:先全部通过
+        note.setIsChecked(1);
 
         int userRole = user.getUserRole();
         // 0管理员，1会员，2非会员

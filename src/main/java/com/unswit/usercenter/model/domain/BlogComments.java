@@ -27,12 +27,12 @@ public class BlogComments {
     /**
      * blog_id
      */
-    private Long blog_id;
+    private Long blogId;
 
     /**
      * 关联的1级评论id，如果是一级评论，则值为0
      */
-    private Long parent_id;
+    private Long parentId;
 
     /**
      * 回复的内容
@@ -47,10 +47,10 @@ public class BlogComments {
     /**
      * 创建时间
      */
-    private Date create_time;
+    private Date createTime;
 
     /**
      * 更新时间
      */
-    private Date update_time;
+    private Date updateTime;
 }

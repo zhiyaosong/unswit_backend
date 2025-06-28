@@ -8,6 +8,8 @@ public class NoteRequestDTO {
 
     private String author; // 笔记作者名称
 
+    private String toolTip;
+
     private String code; // 课程代码
 
     private String lecturer;  // leaturer名字
