@@ -1,15 +1,16 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
-import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.model.domain.request.UserLoginRequest;
 import com.unswit.usercenter.model.domain.request.UserRegisterRequest;
 import com.unswit.usercenter.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +30,10 @@ import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
 /**
  * 用户接口
  */
+@Tag(name = "User接口", description = "用户增删改查接口")
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+// @CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -59,6 +61,7 @@ public class UserController {
      * @param userRegisterRequest
      * @return
      */
+    @Operation(summary = "用户注册", description = "")
     @PostMapping("/register")
     public BaseResponse<String> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         // 校验
@@ -166,7 +169,7 @@ public class UserController {
             ) {
 //        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 //        User currentUser = (User) userObj;
-        System.out.println("进入control");
+
         if (token == null || token.isEmpty()) {
             throw new BusinessException("未携带登录 token",50002,"未登录，无法查看论坛等内容");
         }

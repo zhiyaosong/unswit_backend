@@ -1,9 +1,9 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.*;
 import com.unswit.usercenter.dto.request.AddNoteRequestDTO;
 import com.unswit.usercenter.dto.request.NoteLikeRequestDTO;
@@ -18,6 +18,7 @@ import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.service.UserNoteLikesService;
 import com.unswit.usercenter.utils.UserHolder;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "note接口", description = "notes增删改接口（查在course接口里）")
 @RestController
 @RequestMapping("/note")
 @CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
@@ -110,7 +112,7 @@ public class NoteController {
      */
     @PostMapping("likes")
     public BaseResponse<NoteLikeResponseDTO> getLikes(@RequestBody NoteLikeRequestDTO req) {
-        System.out.println("进入likes逻辑");
+
         String userId = req.getUserId();
         List<Long> noteIds = req.getNoteIds();
         if (userId == null || noteIds == null || noteIds.isEmpty()) {
@@ -125,7 +127,7 @@ public class NoteController {
         NoteLikeResponseDTO resp = new NoteLikeResponseDTO();
         resp.setLikes(likes);
         resp.setLikedByUser(likedByUser);
-        System.out.println("resp = " + resp);
+
         return ResultUtils.success(resp);
     }
 

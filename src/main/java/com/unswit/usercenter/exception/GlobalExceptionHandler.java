@@ -1,8 +1,8 @@
 package com.unswit.usercenter.exception;
 
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

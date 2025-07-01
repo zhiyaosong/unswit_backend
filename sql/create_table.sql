@@ -29,8 +29,9 @@ create table if not exists `user`
     phone        varchar(256)                       null comment '手机号',
     signature TEXT                                  null comment '自我描述',
 
-    userStatus   int      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
+    userStatus   tinyint      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
     userRole     tinyint  default 2                 not null comment '用户角色: 0 - 管理员 1 - 会员（已发布笔记） 2 - 普通用户',
+
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
     updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     isDelete     tinyint  default 0                 not null comment '是否删除'

@@ -1,6 +1,6 @@
 package com.unswit.usercenter.exception;
 
-import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 
 /**
  * 自定义异常类

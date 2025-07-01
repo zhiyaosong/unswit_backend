@@ -1,18 +1,21 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.model.domain.Blog;
 import com.unswit.usercenter.service.BlogService;
 import com.unswit.usercenter.utils.SystemConstants;
 import com.unswit.usercenter.utils.UserHolder;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+@Tag(name = "Blog接口", description = "Blog增删改查接口")
 @RestController
 @RequestMapping("/blog")
 public class BlogController {
@@ -25,14 +28,14 @@ public class BlogController {
      * @return
      */
     @PostMapping
-    public Result saveBlog(@RequestBody Blog blog) {
+    public BaseResponse<Long> saveBlog(@RequestBody Blog blog) {
         // 获取登录用户
         UserDTO user = UserHolder.getUser();
         blog.setUserId(user.getId());
         // 保存博文
         blogService.save(blog);
         // 返回id
-        return Result.ok(blog.getId());
+        return ResultUtils.success(blog.getId());
     }
 
     /**
@@ -41,7 +44,7 @@ public class BlogController {
      * @return
      */
     @GetMapping("/of/me")
-    public Result queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
+    public BaseResponse<List<Blog>> queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         // 获取登录用户
         UserDTO user = UserHolder.getUser();
         // 根据用户查询
@@ -49,7 +52,7 @@ public class BlogController {
                 .eq("user_id", user.getId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
         // 获取当前页数据
         List<Blog> records = page.getRecords();
-        return Result.ok(records);
+        return ResultUtils.success(records);
     }
     /**
      * 帖子点赞

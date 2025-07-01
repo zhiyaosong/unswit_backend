@@ -6,7 +6,7 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
@@ -133,7 +133,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }else {
             user.setUserName("编程侠");   // 默认用户名，与用户账户不一样
         }
-        user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像（宝贝的玄凤）
+        user.setAvatarUrl("/img/a.png");   // 这个是前端地址，不要在后端找，默认头像
         user.setGender(0);   // 0 代表未知， 1 代表男， 2代表女， 3代表中性
 
         boolean saveResult = this.save(user);

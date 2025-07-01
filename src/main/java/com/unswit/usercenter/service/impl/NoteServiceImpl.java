@@ -3,7 +3,7 @@ package com.unswit.usercenter.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.CategoryCourseDTO;
 import com.unswit.usercenter.dto.request.NoteRequestDTO;
 import com.unswit.usercenter.exception.BusinessException;

@@ -1,4 +1,4 @@
-package com.unswit.usercenter.common;
+package com.unswit.usercenter.utils.responseUtils;
 
 /**
  * 返回工具类

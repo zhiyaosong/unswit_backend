@@ -1,4 +1,4 @@
-package com.unswit.usercenter.common;
+package com.unswit.usercenter.utils.responseUtils;
 
 import lombok.Data;
 

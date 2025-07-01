@@ -17,3 +17,8 @@ spring:
     #database: 0
 server:
   address: 0.0.0.0
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
