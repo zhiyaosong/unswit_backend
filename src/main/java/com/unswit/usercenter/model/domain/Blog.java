@@ -68,4 +68,5 @@ public class Blog {
      * 是否删除
      */
     private Integer isDelete;
+
 }

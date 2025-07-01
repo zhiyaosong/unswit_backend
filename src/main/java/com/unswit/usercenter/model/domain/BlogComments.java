@@ -1,18 +1,22 @@
 package com.unswit.usercenter.model.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * blog comments
  * @TableName blog_comments
  */
-@TableName(value ="blog_comments")
+@TableName(value = "blog_comments")
 @Data
 public class BlogComments {
+
     /**
      * 主键
      */
@@ -27,11 +31,13 @@ public class BlogComments {
     /**
      * blog_id
      */
+    @TableField("blog_id")
     private Long blogId;
 
     /**
      * 关联的1级评论id，如果是一级评论，则值为0
      */
+    @TableField("parent_id")
     private Long parentId;
 
     /**
@@ -47,10 +53,17 @@ public class BlogComments {
     /**
      * 创建时间
      */
+    @TableField("create_time")
     private Date createTime;
 
     /**
      * 更新时间
      */
+    @TableField("update_time")
     private Date updateTime;
+
+    // 用于嵌套二级评论（非数据库字段）
+    @TableField(exist = false)
+    private List<BlogComments> children;
+
 }
