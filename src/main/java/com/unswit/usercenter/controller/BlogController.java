@@ -7,6 +7,7 @@ import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.CommentDTO;
 import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.dto.response.BlogSummaryDTO;
 import com.unswit.usercenter.dto.response.BlogWithCommentsDTO;
 import com.unswit.usercenter.model.domain.Blog;
 import com.unswit.usercenter.model.domain.BlogComments;
@@ -98,34 +99,21 @@ public class BlogController {
     }
 
     /**
-     * 展示某一页的所有blog+评论
+     * 展示一个页单位所有blog（无comment）
+     * 只返回blog
+     * 将代码逻辑写在service里面
      * @param page
      * @param size
      * @return
      */
     @GetMapping
-    public Result listBlogsWithComments(@RequestParam(defaultValue = "1") int page,
-                                        @RequestParam(defaultValue = "5") int size) {
-        Page<Blog> blogPage = blogService.page(
-                new Page<>(page, size),
-                new LambdaQueryWrapper<Blog>()
-                        .orderByDesc(Blog::getCreateTime)
-        );
-
-        List<Blog> blogs = blogPage.getRecords();
-        if (blogs.isEmpty()) return Result.ok(new ArrayList<>());
-
-        List<Long> blogIds = blogs.stream().map(Blog::getId).collect(Collectors.toList());
-        Map<Long, List<CommentDTO>> commentMap = buildBlogCommentMap(blogIds);
-
-        List<BlogWithCommentsDTO> result = blogs.stream().map(blog -> {
-            BlogWithCommentsDTO dto = new BlogWithCommentsDTO();
-            dto.setBlog(blog);
-            dto.setComments(commentMap.getOrDefault(blog.getId(), new ArrayList<>()));
-            return dto;
-        }).collect(Collectors.toList());
-
-        return Result.ok(result);
+    public Result listBlogs(@RequestParam(defaultValue = "1") int page,
+                            @RequestParam(defaultValue = "5") int size) {
+        List<BlogSummaryDTO> listBlogs = blogService.getListBlogs(page, size);
+        if (listBlogs.isEmpty()) {
+            return Result.fail("暂无人发布blog");
+        }
+        return Result.ok(listBlogs);
     }
 
     /**

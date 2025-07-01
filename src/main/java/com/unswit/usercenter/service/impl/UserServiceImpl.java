@@ -8,24 +8,34 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.response.BlogSummaryDTO;
+import com.unswit.usercenter.dto.response.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
+import com.unswit.usercenter.mapper.BlogMapper;
+import com.unswit.usercenter.mapper.NoteMapper;
+import com.unswit.usercenter.model.domain.Blog;
+import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.service.UserService;
 import com.unswit.usercenter.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_KEY;
 import static com.unswit.usercenter.utils.RedisConstants.LOGIN_USER_TTL;
@@ -48,6 +58,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值，混淆密码
      */
     private static final String SALT = "unswit";
+    @Autowired
+    private BlogMapper blogMapper;
+    @Autowired
+    private NoteMapper noteMapper;
 
     @Override
     public User getUserByToken(String token) {
@@ -287,5 +301,79 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         return 1;
     }
+
+    @Override
+    public AccountCenterSummaryDTO getAccountCenterSummary(String userId) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper.eq("userId", userId)
+                .eq("isDelete",0);
+        Long blogCount = blogMapper.selectCount(wrapper);
+
+        QueryWrapper<Note> noteQueryWrapper = new QueryWrapper<>();
+        noteQueryWrapper.eq("userId", userId)
+                .eq("isDelete",0);
+        Long noteCount = noteMapper.selectCount(noteQueryWrapper);
+
+        QueryWrapper<Note> noteQueryWrapper2 = new QueryWrapper<>();
+        noteQueryWrapper2.select("SUM(likeCount) AS totalLikes")
+                .eq("userId", userId)
+                .eq("isDelete", 0);
+
+        Map<String, Object> result = noteMapper.selectMaps(noteQueryWrapper2).get(0);
+        Long totalLikes = result.get("totalLikes") != null ? ((Number) result.get("totalLikes")).longValue(): 0;
+
+        AccountCenterSummaryDTO dto = new AccountCenterSummaryDTO();
+        dto.setBlogCount(blogCount);
+        dto.setNoteCount(noteCount);
+        dto.setLikeCount(totalLikes);
+
+        return dto;
+    }
+
+    @Override
+    public List<NoteSummaryDTO> getNoteSummary(String userId) {
+        List<Note> notes = noteMapper.selectList(
+                new QueryWrapper<Note>()
+                        .eq("userId", userId)
+                        .eq("isDelete", 0)
+                        .eq("noteStatus", 0)
+                        .orderByDesc("updateTime")
+        );
+        List<NoteSummaryDTO> dtoList = notes.stream().map(note -> {
+            NoteSummaryDTO dto = new NoteSummaryDTO();
+            dto.setId(note.getId());
+            dto.setTitle(note.getTitle());
+            dto.setUpdateTime(note.getUpdateTime());
+            dto.setToolTip(note.getToolTip());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return dtoList;
+    }
+
+
+    @Override
+    public List<BlogSummaryDTO> getBlogSummary(String userId) {
+        List<Blog> blogs = blogMapper.selectList(
+                new QueryWrapper<Blog>()
+                        .eq("userId", userId)
+                        .eq("isDelete", 0)
+                        .eq("status", 0)
+                        .orderByDesc("updateTime")
+        );
+        List<BlogSummaryDTO> dtoList = blogs.stream().map(blog -> {
+            BlogSummaryDTO dto = new BlogSummaryDTO();
+            dto.setTitle(blog.getTitle());
+            dto.setUpdateTime(blog.getUpdateTime());
+            dto.setId(blog.getId());
+            String content = blog.getContent();
+            dto.setContent(content.length()>50?content.substring(0,50)+"...":content);
+
+            return dto;
+        }).collect(Collectors.toList());
+
+        return dtoList;
+    }
+
 
 }

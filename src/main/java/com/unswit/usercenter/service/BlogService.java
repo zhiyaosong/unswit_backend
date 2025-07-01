@@ -1,8 +1,11 @@
 package com.unswit.usercenter.service;
 
 import com.unswit.usercenter.dto.Result;
+import com.unswit.usercenter.dto.response.BlogSummaryDTO;
 import com.unswit.usercenter.model.domain.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author zhiyao
@@ -12,4 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface BlogService extends IService<Blog> {
 
     Result likeBlog(Long id);
+
+    List<BlogSummaryDTO> getListBlogs(int page, int size);
+
 }

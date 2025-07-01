@@ -1,16 +1,19 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.unswit.usercenter.utils.responseUtils.BaseResponse;
-import com.unswit.usercenter.utils.responseUtils.ErrorCode;
-import com.unswit.usercenter.utils.responseUtils.ResultUtils;
+import com.unswit.usercenter.common.BaseResponse;
+import com.unswit.usercenter.common.ErrorCode;
+import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.dto.Result;
+import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.response.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.model.domain.request.UserLoginRequest;
 import com.unswit.usercenter.model.domain.request.UserRegisterRequest;
 import com.unswit.usercenter.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.unswit.usercenter.utils.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +33,9 @@ import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
 /**
  * 用户接口
  */
-@Tag(name = "User接口", description = "用户增删改查接口")
 @RestController
 @RequestMapping("/user")
-// @CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -61,7 +63,6 @@ public class UserController {
      * @param userRegisterRequest
      * @return
      */
-    @Operation(summary = "用户注册", description = "")
     @PostMapping("/register")
     public BaseResponse<String> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         // 校验
@@ -169,7 +170,7 @@ public class UserController {
             ) {
 //        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 //        User currentUser = (User) userObj;
-
+        System.out.println("进入control");
         if (token == null || token.isEmpty()) {
             throw new BusinessException("未携带登录 token",50002,"未登录，无法查看论坛等内容");
         }
@@ -206,6 +207,47 @@ public class UserController {
     }
 
     /**
+     * 拿到用户中心上方的简要数据框
+     * @param
+     * @return
+     */
+    @GetMapping("acount/center/summary")
+    public Result getUserSummary() {
+        String userId = UserHolder.getUser().getId();
+        if(userId==null){
+            return Result.fail("用户未登陆！");
+        }
+        AccountCenterSummaryDTO summary = userService.getAccountCenterSummary(userId);
+        return Result.ok(summary);
+    }
+
+    /**
+     * 笔记卡片列表
+     * @return
+     */
+    @GetMapping("account/center/mynote")
+    public Result getMyNote() {
+        String userId = UserHolder.getUser().getId();
+        if (userId==null) {
+            return Result.fail("用户未登陆");
+        }
+        List<NoteSummaryDTO> noteSummary = userService.getNoteSummary(userId);
+
+        return Result.ok(noteSummary);
+    }
+
+    @GetMapping("account/center/myblog")
+    public Result getMyBlog() {
+        String userId = UserHolder.getUser().getId();
+        if (userId==null) {
+            return Result.fail("用户未登陆");
+        }
+        userService.getBlogSummary(userId);
+        return Result.ok();
+    }
+
+
+    /**
      * 是否为管理员
      *
      * @param request
@@ -217,5 +259,7 @@ public class UserController {
         User user = (User) userObj;
         return user != null && user.getUserRole() == ADMIN_ROLE;
     }
+
+
 
 }

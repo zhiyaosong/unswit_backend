@@ -1,9 +1,13 @@
 package com.unswit.usercenter.service;
 
+import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.response.BlogSummaryDTO;
+import com.unswit.usercenter.dto.response.NoteSummaryDTO;
 import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 用户服务
@@ -37,5 +41,11 @@ public interface UserService extends IService<User> {
      */
     int userLogout(HttpServletRequest request, String token);
 
+
+    AccountCenterSummaryDTO getAccountCenterSummary(String userId);
+
+    List<NoteSummaryDTO> getNoteSummary(String userId);
+
+    List<BlogSummaryDTO> getBlogSummary(String userId);
 
 }
