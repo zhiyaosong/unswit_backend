@@ -41,10 +41,12 @@ public class NoteController {
     @Autowired
     private NoteMapper noteMapper;
 
-    /**
-     * 查询所有笔记，并以JSON数组形式返回
-     */
 
+    /**
+     * 添加笔记接口
+     * @param req
+     * @return
+     */
     @PostMapping("add")
     public BaseResponse<Map<String, CategoryCourseDTO>> addNote(@RequestBody AddNoteRequestDTO req) {
         NoteRequestDTO note = req.getNote();

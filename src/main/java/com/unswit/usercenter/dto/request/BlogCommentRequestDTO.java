@@ -1,49 +1,29 @@
 package com.unswit.usercenter.dto.request;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.io.Serializable;
-import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class BlogCommentRequestDTO implements Serializable {
-    /**
-     * comment id
-     */
-    private Long id;
 
     /**
-     * id,UUID（无中划线32位）
+     * 博客 ID
      */
-    private String userId;
+    private Long blogId;
 
     /**
-     * blog_id
+     * 关联的一级评论 ID，如果是一级评论，则值为 0
      */
-    private Long blog_id;
-
-    /**
-     * 关联的1级评论id，如果是一级评论，则值为0
-     */
-    private Long parent_id;
+    private Long parentId;
 
     /**
      * 回复的内容
      */
 //    @NotEmpty(message = "评论内容不能为空")
     private String content;
-
-    /**
-     * 状态，0：正常，1：被举报，2：禁止查看
-     */
-    private Integer status;
-
-
 }

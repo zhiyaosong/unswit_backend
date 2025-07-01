@@ -145,6 +145,12 @@ CREATE TABLE if not exists `blog_comments`
     foreign key (parentId) references blog_comments(id) on delete cascade
 )comment 'blog comments' ;
 
+ALTER TABLE blog_comments
+ADD CONSTRAINT fk_comment_parent
+FOREIGN KEY (parentId) REFERENCES blog_comments(id)
+ON DELETE CASCADE;
+
+
 create table if not exists user_blog_likes
 (
     userId          char(32)              NOT NULL,
