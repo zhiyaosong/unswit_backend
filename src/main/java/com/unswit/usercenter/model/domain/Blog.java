@@ -20,7 +20,7 @@ public class Blog {
     private Long id;
 
     /**
-     * id,UUID（无中划线32位）
+     * userId,UUID（无中划线32位）
      */
     private String userId;
 

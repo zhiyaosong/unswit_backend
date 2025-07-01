@@ -37,8 +37,6 @@ create table if not exists `user`
     isDelete     tinyint  default 0                 not null comment '是否删除'
 )comment '用户';
 
-SET @yangId = REPLACE(UUID(),'-','');
-
 
 create table if not exists `course`
 (
@@ -110,7 +108,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-
 # 帖子表
 create table if not exists `blog`
 (
@@ -120,7 +117,7 @@ create table if not exists `blog`
     images       varchar(2048) character set utf8mb4 collate utf8mb4_general_ci  comment '帖子照片，最多9张，多张以","隔开',
     content      varchar(2048) character set utf8mb4 collate utf8mb4_unicode_ci not null comment '帖子内容',
     likeCount    int(8) unsigned null default 0 comment '点赞数量',
-    commentCount     int(8) unsigned null default null comment '评论数量',
+    commentCount int(8) unsigned null default null comment '评论数量',
     status       tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
 
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
@@ -129,27 +126,23 @@ create table if not exists `blog`
     FOREIGN KEY (userId) REFERENCES user(id)
 )comment '帖子';
 
+
 # blog comments
 CREATE TABLE if not exists `blog_comments`
 (
-    id           bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-    userId       char(32)  not null comment 'id,UUID（无中划线32位）' ,
+    id          bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    userId      char(32)  not null comment 'id,UUID（无中划线32位）' ,
     blogId      bigint  NOT NULL COMMENT 'blog_id',
     parentId    bigint(20) UNSIGNED NOT NULL COMMENT '关联的1级评论id，如果是一级评论，则值为0',
-    content      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
-    status       tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
+    content     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
+    status      tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
     createTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updateTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id) USING BTREE,
-    FOREIGN KEY (userId) REFERENCES user(id),
-    FOREIGN KEY (blogId) REFERENCES blog(id),
-    foreign key (parentId) references blog_comments(id) on delete cascade
+    CONSTRAINT fk_comment_user FOREIGN KEY (userId) REFERENCES user(id),
+    CONSTRAINT fk_comment_blog FOREIGN KEY (blogId) REFERENCES blog(id),
+    CONSTRAINT fk_comment_parent FOREIGN KEY (parentId) REFERENCES blog_comments(id) ON DELETE CASCADE
 )comment 'blog comments' ;
-
-ALTER TABLE blog_comments
-ADD CONSTRAINT fk_comment_parent
-FOREIGN KEY (parentId) REFERENCES blog_comments(id)
-ON DELETE CASCADE;
 
 
 create table if not exists user_blog_likes
@@ -202,6 +195,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+
+SET @yangId = REPLACE(UUID(),'-','');
 
 # 导入示例用户
 INSERT INTO user_centre.user (
@@ -287,6 +282,54 @@ VALUES
     ('GSOE9820', '9820', 5, '工程项目管理方法论 Eng Project Mgmt')
 ;
 
+
+INSERT INTO `blog` (
+    `userId`, `title`, `images`, `content`,
+    `likeCount`, `commentCount`, `status`,
+    `createTime`, `updateTime`, `isDelete`
+) VALUES
+-- 示例 1：单张图片
+(@yangId,
+ '第一次发帖！',
+ 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fwww.bowumi.com%2Fwp-content%2Fuploads%2Ftupianbd%2F0%2F253%2F2972567671%2F623337291.jpg&imgrefurl=https%3A%2F%2Fwww.bowumi.com%2F4055.html&docid=iQey2Fh_quLIQM&tbnid=E4fGiqq5k9ztaM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECFcQAA..i&w=500&h=500&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECFcQAA',
+ '大家好，这是我在新平台的第一篇帖子，欢迎交流。',
+ 12, 3, 0,
+ '2025-07-01 09:15:23', '2025-07-01 09:15:23', 0),
+
+-- 示例 2：多张图片
+(@yangId,
+ '周末郊游',
+ 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimg95.699pic.com%2Felement%2F40155%2F1925.png_300.png&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian%2Fkatongxiaokeai.html&docid=xkVoY59TK4gb_M&tbnid=rDC8y_EWR9enOM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECH8QAA..i&w=300&h=300&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECH8QAA,
+https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fpic.pngsucai.com%2F00%2F85%2F84%2Fcf86428dcc0906b6.webp&imgrefurl=https%3A%2F%2Fwww.pngsucai.com%2Fpng%2F8584342.html&docid=FaQObJmSEN6ThM&tbnid=31k-1LQOv4frBM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECDoQAA..i&w=751&h=584&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECDoQAA',
+ '这周末去了郊外踏青，风景很美，分享几张照片。',
+ 45, 10, 0,
+ '2025-06-28 18:42:10', '2025-06-28 18:50:05', 0),
+
+-- 示例 3：无图片
+(@yangId,
+ '读书笔记：<算法导论>',
+ NULL,
+ '最近在读《算法导论》，做了些笔记，整理如下：…',
+ 30, 5, 0,
+ '2025-06-30 21:07:45', '2025-06-30 21:07:45', 0),
+
+-- 示例 4：9 张图片上限测试
+(@yangId,
+ '美食分享',
+ 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA,
+        https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA,
+        https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA',
+ '今天在家做了九种小吃，味道不错，大家可以参考我的做法。',
+ 88, 22, 0,
+ '2025-06-25 12:30:00', '2025-06-25 12:45:10', 0),
+
+-- 示例 5：已删除和被举报示例
+(@yangId,
+ '测试帖（已删除）',
+ NULL,
+ '这是一条测试帖，目前已被软删除。',
+ 0, 0, 2,
+ '2025-06-20 08:00:00', '2025-06-20 08:00:00', 1);
 
 INSERT INTO user_centre.note (
     courseId, enrollTime, title, link, author, userId, lecturer, toolTip,isOfficial,isChecked)

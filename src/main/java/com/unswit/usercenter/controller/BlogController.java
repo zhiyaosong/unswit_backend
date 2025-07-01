@@ -131,7 +131,7 @@ public class BlogController {
     /**
      * 转化comment为commentDTO
      * @param comment
-     * @return
+     * @return CommentDTO
      */
     private CommentDTO toDTO(BlogComments comment) {
         CommentDTO dto = new CommentDTO();
@@ -149,7 +149,7 @@ public class BlogController {
     /**
      * 工具类方法，用于构建 blogId -> 评论树结构
      * @param blogIds
-     * @return
+     * @return Map<Long, List<CommentDTO>>
      */
     public Map<Long, List<CommentDTO>> buildBlogCommentMap(List<Long> blogIds) {
         // 1. 查询一级评论（parentId = 0）

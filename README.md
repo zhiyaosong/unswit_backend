@@ -8,3 +8,10 @@ http://localhost:your_port/api/swagger-ui/index.html
 http://localhost:your_port/api/swagger-ui.html
 ```
 
+## 初次启动
+更改`.env`中变量
+
+```
+DATASOURCE_PASSWORD=your_mysql_password
+```
+
