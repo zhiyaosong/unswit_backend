@@ -7,10 +7,10 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
-import com.unswit.usercenter.dto.UserDTO;
-import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
-import com.unswit.usercenter.dto.response.BlogSummaryDTO;
-import com.unswit.usercenter.dto.response.NoteSummaryDTO;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
+import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
+import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.BlogMapper;
 import com.unswit.usercenter.mapper.NoteMapper;
@@ -28,7 +28,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,10 +71,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(tokenKey);
         // 将 Redis 里的 Map 再转回 UserDTO
-        UserDTO userDTO = BeanUtil.mapToBean(userMap, UserDTO.class, true);
-        System.out.println(userDTO);
+        UserSimpleDTO userSimpleDTO = BeanUtil.mapToBean(userMap, UserSimpleDTO.class, true);
+        System.out.println(userSimpleDTO);
         // 校验用户是否合法
-        String userId = userDTO.getId();
+        String userId = userSimpleDTO.getId();
         User user = userMapper.selectById(userId);
         if (user==null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -203,9 +202,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //1.生成token，生成登陆令牌
         String token = UUID.randomUUID().toString(true);
         //2.将User对象转为Hash存储， userDTO里只有id和userName
-        UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        UserSimpleDTO userSimpleDTO = BeanUtil.copyProperties(user, UserSimpleDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(
-                userDTO,
+                userSimpleDTO,
                 new HashMap<>(),
                 CopyOptions.create()
                         .setIgnoreNullValue(true)

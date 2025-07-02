@@ -1,8 +1,8 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
-import com.unswit.usercenter.dto.response.BlogSummaryDTO;
-import com.unswit.usercenter.dto.response.NoteSummaryDTO;
+import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
+import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 

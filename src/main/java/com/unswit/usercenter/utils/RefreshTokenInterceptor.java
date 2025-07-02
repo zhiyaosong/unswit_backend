@@ -3,7 +3,7 @@ package com.unswit.usercenter.utils;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 
-import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -34,9 +34,9 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
             return true;
         }
         //将查询到的Hash数据转为UserDTO对象
-        UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
+        UserSimpleDTO userSimpleDTO = BeanUtil.fillBeanWithMap(userMap, new UserSimpleDTO(), false);
         //如果存在，保存用户到ThreadLocal中
-        UserHolder.saveUser(userDTO);
+        UserHolder.saveUser(userSimpleDTO);
         System.out.println("保存用户到ThreadLocal中");
         // 刷新token有效期
         stringRedisTemplate.expire(key, RedisConstants.LOGIN_CODE_TTL, TimeUnit.MINUTES);

@@ -1,9 +1,9 @@
-package com.unswit.usercenter.dto;
+package com.unswit.usercenter.dto.user;
 
 import lombok.Data;
 
 @Data
-public class UserDTO {
+public class UserSimpleDTO {
     private String id;
     private String useAccount;
 }

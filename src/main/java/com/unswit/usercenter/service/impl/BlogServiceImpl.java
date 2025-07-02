@@ -6,7 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.response.BlogSummaryDTO;
+import com.unswit.usercenter.dto.blog.response.BlogListResponseVO;
+import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
 import com.unswit.usercenter.mapper.UserMapper;
 import com.unswit.usercenter.model.domain.Blog;
 import com.unswit.usercenter.model.domain.User;
@@ -19,12 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.unswit.usercenter.utils.RedisConstants.BLOG_LIKED_KEY;
 
 /**
 * @author zhiyao
@@ -32,10 +30,7 @@ import static com.unswit.usercenter.utils.RedisConstants.BLOG_LIKED_KEY;
 * @createDate 2025-06-12 12:02:11
 */
 @Service
-public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
-    implements BlogService{
-    @Resource
-    private BlogService blogService;
+public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService{
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
@@ -72,39 +67,47 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
     }
 
     @Override
-    public List<BlogSummaryDTO> getListBlogs(int page, int size) {
-        //返回一个Page<Blog>对象 里面包含当前页的结果和分页信息
-        Page<Blog> blogPage = blogService.page(
+    public BlogListResponseVO getListBlogs(int page, int size) {
+        // 1. 分页查询 Blog 对象
+        Page<Blog> blogPage = this.page(
                 new Page<>(page, size),
                 new LambdaQueryWrapper<Blog>()
                         .orderByDesc(Blog::getCreateTime)
         );
         List<Blog> blogs = blogPage.getRecords();
 
+        // 2. 转换为 DTO 列表
         List<BlogSummaryDTO> listblogs = blogs.stream().map(blog -> {
             String userId = blog.getUserId();
-            QueryWrapper<User> wrapper = new QueryWrapper<>();
-            wrapper.eq("id", userId)
-                    .select("userName");
-            List<Object> result = userMapper.selectObjs(wrapper);
-            String userName = result.isEmpty() ? "匿名用户" : (String) result.get(0);
-
+            String userName = Optional.ofNullable(
+                            userMapper.selectOne(
+                                    new QueryWrapper<User>()
+                                            .eq("id", userId)
+                                            .select("userName")
+                            )
+                    ).map(User::getUserName)
+                    .orElse("匿名用户");
 
             BlogSummaryDTO dto = new BlogSummaryDTO();
             dto.setId(blog.getId());
             dto.setTitle(blog.getTitle());
-            dto.setUserName(userName);
+            dto.setAuthor(userName);
             dto.setUpdateTime(blog.getUpdateTime());
             String content = blog.getContent();
-            dto.setContent(content.length() > 50 ? content.substring(0, 50) + "..." : content);
+            dto.setContent(
+                    content.length() > 50
+                            ? content.substring(0, 50) + "…"
+                            : content
+            );
             return dto;
         }).collect(Collectors.toList());
 
-        return listblogs;
+        // 3. 封装返回
+        BlogListResponseVO response = new BlogListResponseVO();
+        response.setBlogSumList(listblogs);
+        response.setTotal((int) blogPage.getTotal());
+        return response;
     }
 
 }
-
-
-
 

@@ -4,9 +4,9 @@ package com.unswit.usercenter.controller;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
-import com.unswit.usercenter.dto.CategoryCourseDTO;
+import com.unswit.usercenter.dto.note.CategoryCourseDTO;
 
-import com.unswit.usercenter.dto.request.UserIdRequest;
+import com.unswit.usercenter.dto.user.request.UserIdRequestVO;
 import com.unswit.usercenter.service.CourseService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +28,7 @@ public class CourseController {
      * 尾部拼接每个课程对应的note列表
      */
     @PostMapping()
-    public BaseResponse<Map<String, CategoryCourseDTO>> getAllCourseNote(@RequestBody UserIdRequest req) {
+    public BaseResponse<Map<String, CategoryCourseDTO>> getAllCourseNote(@RequestBody UserIdRequestVO req) {
         String userId = req.getUserId();
         System.out.println(userId);
         Map<String, CategoryCourseDTO> allCourseNote = courseService.getAllCourseNote(userId);

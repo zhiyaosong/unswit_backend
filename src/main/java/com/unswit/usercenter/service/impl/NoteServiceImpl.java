@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
-import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.request.NoteRequestDTO;
+import com.unswit.usercenter.dto.note.CategoryCourseDTO;
+import com.unswit.usercenter.dto.note.request.NoteRequestVO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.CourseMapper;
 import com.unswit.usercenter.mapper.UserMapper;
@@ -52,12 +52,12 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     @Resource
     private CourseService courseService;
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
 
     @Override
-    public Map<String, CategoryCourseDTO> addNote(NoteRequestDTO noteDTO, String userId) {
+    public Map<String, CategoryCourseDTO> addNote(NoteRequestVO noteDTO, String userId) {
 
         if (noteDTO == null) {
             // 这里你可以选择抛异常，也可以返回一个空列表

@@ -1,16 +1,16 @@
 package com.unswit.usercenter.utils;
 
 
-import com.unswit.usercenter.dto.UserDTO;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
 
 public class UserHolder {
-    private static final ThreadLocal<UserDTO> tl = new ThreadLocal<>();
+    private static final ThreadLocal<UserSimpleDTO> tl = new ThreadLocal<>();
 
-    public static void saveUser(UserDTO user){
+    public static void saveUser(UserSimpleDTO user){
         tl.set(user);
     }
 
-    public static UserDTO getUser(){
+    public static UserSimpleDTO getUser(){
         return tl.get();
     }
 

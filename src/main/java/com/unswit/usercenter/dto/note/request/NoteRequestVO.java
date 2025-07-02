@@ -1,9 +1,9 @@
-package com.unswit.usercenter.dto.request;
+package com.unswit.usercenter.dto.note.request;
 
 import lombok.Data;
 
 @Data
-public class NoteRequestDTO {
+public class NoteRequestVO {
     private String title; // 笔记名称
 
     private String author; // 笔记作者名称

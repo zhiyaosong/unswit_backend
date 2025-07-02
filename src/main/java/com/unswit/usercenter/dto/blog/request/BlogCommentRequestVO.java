@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.request;
+package com.unswit.usercenter.dto.blog.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BlogCommentRequestDTO implements Serializable {
+public class BlogCommentRequestVO implements Serializable {
 
     /**
      * 博客 ID

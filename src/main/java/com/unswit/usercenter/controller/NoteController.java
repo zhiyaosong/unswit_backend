@@ -1,16 +1,16 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.unswit.usercenter.dto.note.CategoryCourseDTO;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
-import com.unswit.usercenter.dto.*;
-import com.unswit.usercenter.dto.request.AddNoteRequestDTO;
-import com.unswit.usercenter.dto.request.NoteLikeRequestDTO;
-import com.unswit.usercenter.dto.request.NoteRequestDTO;
-import com.unswit.usercenter.dto.request.ToggleLikeRequestDTO;
-import com.unswit.usercenter.dto.response.NoteLikeResponseDTO;
-import com.unswit.usercenter.dto.response.ToggleLikeResponseDTO;
+import com.unswit.usercenter.dto.note.request.AddNoteRequestVO;
+import com.unswit.usercenter.dto.note.request.NoteLikeRequestVO;
+import com.unswit.usercenter.dto.note.request.NoteRequestVO;
+import com.unswit.usercenter.dto.note.request.ToggleLikeRequestVO;
+import com.unswit.usercenter.dto.note.response.NoteLikeResponseVO;
+import com.unswit.usercenter.dto.note.ToggleLikeResponseDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.model.domain.Note;
@@ -50,8 +50,8 @@ public class NoteController {
      * @return
      */
     @PostMapping("add")
-    public BaseResponse<Map<String, CategoryCourseDTO>> addNote(@RequestBody AddNoteRequestDTO req) {
-        NoteRequestDTO note = req.getNote();
+    public BaseResponse<Map<String, CategoryCourseDTO>> addNote(@RequestBody AddNoteRequestVO req) {
+        NoteRequestVO note = req.getNote();
 
         String userId = req.getUserId();
 
@@ -113,7 +113,7 @@ public class NoteController {
      * @return NoteLikesResponseDTO
      */
     @PostMapping("likes")
-    public BaseResponse<NoteLikeResponseDTO> getLikes(@RequestBody NoteLikeRequestDTO req) {
+    public BaseResponse<NoteLikeResponseVO> getLikes(@RequestBody NoteLikeRequestVO req) {
 
         String userId = req.getUserId();
         List<Long> noteIds = req.getNoteIds();
@@ -126,7 +126,7 @@ public class NoteController {
         Map<Long, Boolean> likedByUser = noteService.getUserLikedStatus(userId, noteIds);
 
         // 3. 组装返回
-        NoteLikeResponseDTO resp = new NoteLikeResponseDTO();
+        NoteLikeResponseVO resp = new NoteLikeResponseVO();
         resp.setLikes(likes);
         resp.setLikedByUser(likedByUser);
 
@@ -140,7 +140,7 @@ public class NoteController {
      */
     @PostMapping("/like")
     public BaseResponse<ToggleLikeResponseDTO> toggleLike(
-            @RequestBody ToggleLikeRequestDTO req
+            @RequestBody ToggleLikeRequestVO req
     ) {
         ToggleLikeResponseDTO resp = userNoteLikesService.toggleLike(req);
         return ResultUtils.success(resp);

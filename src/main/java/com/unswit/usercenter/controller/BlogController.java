@@ -1,16 +1,13 @@
 package com.unswit.usercenter.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.unswit.usercenter.dto.blog.response.BlogComResponseVO;
+import com.unswit.usercenter.dto.blog.response.BlogListResponseVO;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
-import com.unswit.usercenter.dto.CommentDTO;
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.UserDTO;
-import com.unswit.usercenter.dto.response.BlogSummaryDTO;
-import com.unswit.usercenter.dto.response.BlogWithCommentsDTO;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.model.domain.Blog;
-import com.unswit.usercenter.model.domain.BlogComments;
 import com.unswit.usercenter.service.BlogCommentsService;
 import com.unswit.usercenter.service.BlogService;
 import com.unswit.usercenter.utils.SystemConstants;
@@ -19,14 +16,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Tag(name = "Blog接口", description = "Blog增删改查接口")
 @RestController
-@RequestMapping("/blog")
+@RequestMapping("/blogs")
 public class BlogController {
     @Resource
     private BlogService blogService;
@@ -41,7 +35,7 @@ public class BlogController {
     @PostMapping("/add")
     public BaseResponse<Long> saveBlog(@RequestBody Blog blog) {
         // 获取登录用户
-        UserDTO user = UserHolder.getUser();
+        UserSimpleDTO user = UserHolder.getUser();
         blog.setUserId(user.getId());
         // 保存博文
         blogService.save(blog);
@@ -57,7 +51,7 @@ public class BlogController {
     @GetMapping("/of/me")
     public BaseResponse<List<Blog>> queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         // 获取登录用户
-        UserDTO user = UserHolder.getUser();
+        UserSimpleDTO user = UserHolder.getUser();
         // 根据用户查询
         Page<Blog> page = blogService.query()
                 .eq("user_id", user.getId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
@@ -83,19 +77,11 @@ public class BlogController {
      * @param blogId
      * @return
      */
+    // TODO: 增加错误处理
     @GetMapping("/{blogId}")
-    public Result getBlogDetail(@PathVariable Long blogId) {
-        Blog blog = blogService.getById(blogId);
-        if (blog == null) return Result.fail("博客不存在");
+    public BaseResponse<BlogComResponseVO> getBlog(@PathVariable Long blogId) {
 
-        List<Long> blogIds = new ArrayList<>();
-        blogIds.add(blogId);
-        Map<Long, List<CommentDTO>> commentMap = buildBlogCommentMap(blogIds);
-
-        BlogWithCommentsDTO dto = new BlogWithCommentsDTO();
-        dto.setBlog(blog);
-        dto.setComments(commentMap.getOrDefault(blogId, new ArrayList<>()));
-        return Result.ok(dto);
+        return ResultUtils.success(blogCommentsService.getBlogComments(blogId));
     }
 
     /**
@@ -106,69 +92,14 @@ public class BlogController {
      * @param size
      * @return
      */
-    @GetMapping
-    public Result listBlogs(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "5") int size) {
-        List<BlogSummaryDTO> listBlogs = blogService.getListBlogs(page, size);
-        if (listBlogs.isEmpty()) {
-            return Result.fail("暂无人发布blog");
-        }
-        return Result.ok(listBlogs);
+    @GetMapping({ "", "/" })
+    public BaseResponse<BlogListResponseVO> listBlogs(@RequestParam(defaultValue = "1") int page,
+                                                      @RequestParam(defaultValue = "5") int size) {
+        BlogListResponseVO listBlogs = blogService.getListBlogs(page, size);
+        return ResultUtils.success(listBlogs);
     }
 
-    /**
-     * 转化comment为commentDTO
-     * @param comment
-     * @return CommentDTO
-     */
-    private CommentDTO toDTO(BlogComments comment) {
-        CommentDTO dto = new CommentDTO();
-        dto.setId(comment.getId());
-        dto.setUserId(comment.getUserId());
-        dto.setContent(comment.getContent());
-        dto.setCreateTime(comment.getCreateTime());
-        dto.setBlogId(comment.getBlogId());
-        if (comment.getChildren() != null && !comment.getChildren().isEmpty()) {
-            dto.setChildren(comment.getChildren().stream().map(this::toDTO).collect(Collectors.toList()));
-        }
-        return dto;
-    }
 
-    /**
-     * 工具类方法，用于构建 blogId -> 评论树结构
-     * @param blogIds
-     * @return Map<Long, List<CommentDTO>>
-     */
-    public Map<Long, List<CommentDTO>> buildBlogCommentMap(List<Long> blogIds) {
-        // 1. 查询一级评论（parentId = 0）
-        List<BlogComments> topLevel = blogCommentsService.list(
-                new LambdaQueryWrapper<BlogComments>()
-                        .in(BlogComments::getBlogId, blogIds)
-                        .eq(BlogComments::getParentId, 0)
-                        .orderByDesc(BlogComments::getCreateTime)
-        );
 
-        // 2. 查询对应的所有二级评论
-        List<Long> parentIds = topLevel.stream()
-                .map(BlogComments::getId)
-                .collect(Collectors.toList());
 
-        List<BlogComments> replies = parentIds.isEmpty()
-                ? new ArrayList<>()
-                : blogCommentsService.list(
-                new LambdaQueryWrapper<BlogComments>()
-                        .in(BlogComments::getParentId, parentIds)
-                        .orderByAsc(BlogComments::getCreateTime)
-        );
-
-        // 3. 将二级评论按 parentId 分组
-        Map<Long, List<BlogComments>> replyMap = replies.stream()
-                .collect(Collectors.groupingBy(BlogComments::getParentId));
-
-        // 4. 将二级评论嵌套进一级评论中，并转为 DTO，再按 blogId 分组
-        return topLevel.stream().map(parent -> {
-            parent.setChildren(replyMap.get(parent.getId()));
-            return toDTO(parent);
-        }).collect(Collectors.groupingBy(CommentDTO::getBlogId));
-    }
 }

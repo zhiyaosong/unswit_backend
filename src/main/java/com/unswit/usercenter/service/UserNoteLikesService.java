@@ -1,7 +1,7 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.request.ToggleLikeRequestDTO;
-import com.unswit.usercenter.dto.response.ToggleLikeResponseDTO;
+import com.unswit.usercenter.dto.note.request.ToggleLikeRequestVO;
+import com.unswit.usercenter.dto.note.ToggleLikeResponseDTO;
 import com.unswit.usercenter.model.domain.UserNoteLikes;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserNoteLikesService extends IService<UserNoteLikes> {
 
-    ToggleLikeResponseDTO toggleLike(ToggleLikeRequestDTO req);
+    ToggleLikeResponseDTO toggleLike(ToggleLikeRequestVO req);
 }

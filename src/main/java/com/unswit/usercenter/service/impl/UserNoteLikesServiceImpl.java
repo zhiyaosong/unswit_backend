@@ -1,8 +1,8 @@
 package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.dto.request.ToggleLikeRequestDTO;
-import com.unswit.usercenter.dto.response.ToggleLikeResponseDTO;
+import com.unswit.usercenter.dto.note.request.ToggleLikeRequestVO;
+import com.unswit.usercenter.dto.note.ToggleLikeResponseDTO;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.model.domain.UserNoteLikes;
 import com.unswit.usercenter.service.UserNoteLikesService;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 
 /**
 * @author zy183
@@ -30,7 +29,7 @@ public class UserNoteLikesServiceImpl extends ServiceImpl<UserNoteLikesMapper, U
 
     @Override
     @Transactional
-    public ToggleLikeResponseDTO toggleLike(ToggleLikeRequestDTO req){
+    public ToggleLikeResponseDTO toggleLike(ToggleLikeRequestVO req){
         String userId = req.getUserId();
         Long noteId = req.getNoteId();
 

@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto;
+package com.unswit.usercenter.dto.note;
 
 import java.util.List;
 

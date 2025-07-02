@@ -31,13 +31,13 @@ public class BlogComments {
     /**
      * blog_id
      */
-    @TableField("blog_id")
+    @TableField("blogId")
     private Long blogId;
 
     /**
-     * 关联的1级评论id，如果是一级评论，则值为0
+     * 关联的1级评论id，如果是一级评论，则值为null
      */
-    @TableField("parent_id")
+    @TableField("parentId")
     private Long parentId;
 
     /**
@@ -53,13 +53,13 @@ public class BlogComments {
     /**
      * 创建时间
      */
-    @TableField("create_time")
+    @TableField("createTime")
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @TableField("update_time")
+    @TableField("updateTime")
     private Date updateTime;
 
     // 用于嵌套二级评论（非数据库字段）

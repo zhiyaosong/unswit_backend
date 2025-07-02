@@ -1,20 +1,14 @@
 package com.unswit.usercenter.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.request.BlogCommentRequestDTO;
+import com.unswit.usercenter.dto.blog.request.BlogCommentRequestVO;
 import com.unswit.usercenter.model.domain.BlogComments;
-import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.service.BlogCommentsService;
 import com.unswit.usercenter.utils.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/comments")
@@ -27,7 +21,7 @@ public class BlogCommentsController {
      * @return
      */
     @PostMapping("/add")
-    public Result addComment(@RequestBody BlogCommentRequestDTO dto) {
+    public Result addComment(@RequestBody BlogCommentRequestVO dto) {
         String id = UserHolder.getUser().getId();
         BlogComments comment = new BlogComments();
         comment.setContent(dto.getContent());

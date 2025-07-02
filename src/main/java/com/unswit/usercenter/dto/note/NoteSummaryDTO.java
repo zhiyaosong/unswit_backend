@@ -1,8 +1,7 @@
-package com.unswit.usercenter.dto.response;
+package com.unswit.usercenter.dto.note;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**

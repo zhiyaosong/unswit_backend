@@ -1,7 +1,14 @@
 package com.unswit.usercenter.service;
 
+import com.unswit.usercenter.dto.blog.CommentDTO;
+import com.unswit.usercenter.dto.blog.response.BlogComResponseVO;
 import com.unswit.usercenter.model.domain.BlogComments;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.unswit.usercenter.model.domain.User;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author zhiyao
@@ -10,4 +17,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface BlogCommentsService extends IService<BlogComments> {
 
+    BlogComResponseVO getBlogComments(Long blogId);
+
+    CommentDTO toDto(BlogComments bc, Map<String, User> userMap);
 }

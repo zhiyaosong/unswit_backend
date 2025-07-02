@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.response;
+package com.unswit.usercenter.dto.note;
 
 import lombok.Data;
 

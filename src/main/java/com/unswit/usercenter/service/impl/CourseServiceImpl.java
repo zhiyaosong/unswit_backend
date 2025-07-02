@@ -2,8 +2,8 @@ package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.CourseNoteDTO;
+import com.unswit.usercenter.dto.note.CategoryCourseDTO;
+import com.unswit.usercenter.dto.note.CourseNoteDTO;
 import com.unswit.usercenter.mapper.CourseMapper;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.mapper.UserMapper;
@@ -11,6 +11,7 @@ import com.unswit.usercenter.model.domain.Course;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.service.CourseService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -92,13 +93,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
                 }
             }
             CourseNoteDTO courseNoteDTO = new CourseNoteDTO();
-            // set每一个课程DTO
-            courseNoteDTO.setCourseId(courseId);
-            courseNoteDTO.setCategory(course.getCategory());
-            courseNoteDTO.setTitle(course.getTitle());
+
+            BeanUtils.copyProperties(course, courseNoteDTO);
+            courseNoteDTO.setCourseId(course.getId());
             courseNoteDTO.setNoteList(notes);
-            courseNoteDTO.setCode(course.getCode());
-            courseNoteDTO.setToolTip(course.getToolTip());
+
             String key;
             switch (courseNoteDTO.getCategory()) {
                 case 0: key = "IT";    break;

@@ -1,4 +1,4 @@
-package com.unswit.usercenter.model.domain.request;
+package com.unswit.usercenter.dto.user.request;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
  */
 @Data
-public class UserLoginRequest implements Serializable {
+public class UserLoginRequestVO implements Serializable {
 
     private static final long serialVersionUID = 3191241716373120793L;
 

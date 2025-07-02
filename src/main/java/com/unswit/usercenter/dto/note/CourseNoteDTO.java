@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto;
+package com.unswit.usercenter.dto.note;
 
 import com.unswit.usercenter.model.domain.Note;
 import lombok.Data;

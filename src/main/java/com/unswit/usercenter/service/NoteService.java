@@ -1,7 +1,7 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.CategoryCourseDTO;
-import com.unswit.usercenter.dto.request.NoteRequestDTO;
+import com.unswit.usercenter.dto.note.CategoryCourseDTO;
+import com.unswit.usercenter.dto.note.request.NoteRequestVO;
 import com.unswit.usercenter.model.domain.Note;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 */
 public interface NoteService extends IService<Note> {
 
-    Map<String, CategoryCourseDTO> addNote(NoteRequestDTO note, String userId);
+    Map<String, CategoryCourseDTO> addNote(NoteRequestVO note, String userId);
 
 //    List<Note> getAllNotes(User user);
 

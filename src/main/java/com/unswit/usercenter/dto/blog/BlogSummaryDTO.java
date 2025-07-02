@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.response;
+package com.unswit.usercenter.dto.blog;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ public class BlogSummaryDTO {
     /**
      * 发布blog的用户名
      */
-    private String userName;
+    private String author;
     /**
      * blog id
      */

@@ -1,17 +1,16 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.UserDTO;
-import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
-import com.unswit.usercenter.dto.response.NoteSummaryDTO;
+import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
-import com.unswit.usercenter.model.domain.request.UserLoginRequest;
-import com.unswit.usercenter.model.domain.request.UserRegisterRequest;
+import com.unswit.usercenter.dto.user.request.UserLoginRequestVO;
+import com.unswit.usercenter.dto.user.request.UserRegisterRequestVO;
 import com.unswit.usercenter.service.UserService;
 import com.unswit.usercenter.utils.UserHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -60,20 +59,20 @@ public class UserController {
     /**
      * 用户注册
      *
-     * @param userRegisterRequest
+     * @param userRegisterRequestVO
      * @return
      */
     @PostMapping("/register")
-    public BaseResponse<String> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+    public BaseResponse<String> userRegister(@RequestBody UserRegisterRequestVO userRegisterRequestVO) {
         // 校验
-        if (userRegisterRequest == null) {
+        if (userRegisterRequestVO == null) {
             System.out.println("请求为空");
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        String userName = userRegisterRequest.getUserName();
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
+        String userName = userRegisterRequestVO.getUserName();
+        String userAccount = userRegisterRequestVO.getUserAccount();
+        String userPassword = userRegisterRequestVO.getUserPassword();
+        String checkPassword = userRegisterRequestVO.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             System.out.println("字段为空");
             return null;
@@ -92,21 +91,21 @@ public class UserController {
     /**
      * 用户登录
      *
-     * @param userLoginRequest
+     * @param userLoginRequestVO
      * @return token
      */
     @PostMapping("/login")
     public BaseResponse<String> userLogin(
-            @RequestBody UserLoginRequest userLoginRequest,
+            @RequestBody UserLoginRequestVO userLoginRequestVO,
             HttpServletResponse response) {
         //实现登陆功能
         //1.判空 返回错误
-        if (userLoginRequest == null) {
+        if (userLoginRequestVO == null) {
             System.out.println("请求为空");
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
-        String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
+        String userAccount = userLoginRequestVO.getUserAccount();
+        String userPassword = userLoginRequestVO.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
@@ -259,7 +258,5 @@ public class UserController {
         User user = (User) userObj;
         return user != null && user.getUserRole() == ADMIN_ROLE;
     }
-
-
 
 }
