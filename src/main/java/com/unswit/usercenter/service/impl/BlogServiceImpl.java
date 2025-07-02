@@ -76,6 +76,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         );
         List<Blog> blogs = blogPage.getRecords();
 
+        System.out.println("total"+blogPage.getTotal());
+
         // 2. 转换为 DTO 列表
         List<BlogSummaryDTO> listblogs = blogs.stream().map(blog -> {
             String userId = blog.getUserId();

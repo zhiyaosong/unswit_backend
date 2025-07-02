@@ -27,9 +27,9 @@ create table if not exists `user`
     admissionTime varchar(256)                      null comment '入学时间（早于24T1，24T1, 24T2, 24T3, 25T1, 25T2, 25T3, 晚于25T3）',
     email        varchar(512)                       null comment '邮箱',
     phone        varchar(256)                       null comment '手机号',
-    signature TEXT                                  null comment '自我描述',
+    signature    TEXT                               null comment '自我描述',
 
-    userStatus   tinyint      default 0                 not null comment '状态 0 - 正常， 1 - 封号',
+    userStatus   tinyint  default 0             not null comment '状态 0 - 正常， 1 - 封号',
     userRole     tinyint  default 2                 not null comment '用户角色: 0 - 管理员 1 - 会员（已发布笔记） 2 - 普通用户',
 
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
