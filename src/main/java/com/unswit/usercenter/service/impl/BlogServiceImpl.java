@@ -34,8 +34,7 @@ import static com.unswit.usercenter.utils.RedisConstants.BLOG_LIKED_KEY;
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
     implements BlogService{
-    @Resource
-    private BlogService blogService;
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
@@ -74,7 +73,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog>
     @Override
     public List<BlogSummaryDTO> getListBlogs(int page, int size) {
         //返回一个Page<Blog>对象 里面包含当前页的结果和分页信息
-        Page<Blog> blogPage = blogService.page(
+        Page<Blog> blogPage = this.page(
                 new Page<>(page, size),
                 new LambdaQueryWrapper<Blog>()
                         .orderByDesc(Blog::getCreateTime)

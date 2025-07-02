@@ -1,9 +1,9 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.unswit.usercenter.common.BaseResponse;
-import com.unswit.usercenter.common.ErrorCode;
-import com.unswit.usercenter.common.ResultUtils;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.UserDTO;
 import com.unswit.usercenter.dto.response.AccountCenterSummaryDTO;
@@ -211,7 +211,7 @@ public class UserController {
      * @param
      * @return
      */
-    @GetMapping("acount/center/summary")
+    @GetMapping("account/center/summary")
     public Result getUserSummary() {
         String userId = UserHolder.getUser().getId();
         if(userId==null){
@@ -225,7 +225,7 @@ public class UserController {
      * 笔记卡片列表
      * @return
      */
-    @GetMapping("account/center/mynote")
+    @GetMapping("account/center/note")
     public Result getMyNote() {
         String userId = UserHolder.getUser().getId();
         if (userId==null) {
@@ -236,7 +236,7 @@ public class UserController {
         return Result.ok(noteSummary);
     }
 
-    @GetMapping("account/center/myblog")
+    @GetMapping("account/center/blog")
     public Result getMyBlog() {
         String userId = UserHolder.getUser().getId();
         if (userId==null) {
