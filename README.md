@@ -6,6 +6,8 @@
 http://localhost:your_port/api/swagger-ui/index.html
 // 或者
 http://localhost:your_port/api/swagger-ui.html
+或者
+http://localhost:your_port/api/doc.html
 ```
 
 ## 初次启动
