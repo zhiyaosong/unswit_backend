@@ -93,7 +93,7 @@ INSERT INTO `blog` (
 -- 示例 1：单张图片
 (@yangId,
  '第一次发帖！',
- 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fwww.bowumi.com%2Fwp-content%2Fuploads%2Ftupianbd%2F0%2F253%2F2972567671%2F623337291.jpg&imgrefurl=https%3A%2F%2Fwww.bowumi.com%2F4055.html&docid=iQey2Fh_quLIQM&tbnid=E4fGiqq5k9ztaM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECFcQAA..i&w=500&h=500&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECFcQAA',
+ 'https://ss0.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2972567671,623337291&fm=253&gp=0.jpg',
  '大家好，这是我在新平台的第一篇帖子，欢迎交流。',
  12, 3, 0,
  '2025-07-01 09:15:23', '2025-07-01 09:15:23', 0),
@@ -101,8 +101,10 @@ INSERT INTO `blog` (
 -- 示例 2：多张图片
 (@yangId,
  '周末郊游',
- 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimg95.699pic.com%2Felement%2F40155%2F1925.png_300.png&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian%2Fkatongxiaokeai.html&docid=xkVoY59TK4gb_M&tbnid=rDC8y_EWR9enOM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECH8QAA..i&w=300&h=300&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECH8QAA,
-https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fpic.pngsucai.com%2F00%2F85%2F84%2Fcf86428dcc0906b6.webp&imgrefurl=https%3A%2F%2Fwww.pngsucai.com%2Fpng%2F8584342.html&docid=FaQObJmSEN6ThM&tbnid=31k-1LQOv4frBM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECDoQAA..i&w=751&h=584&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECDoQAA',
+ CONCAT_WS(' ',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0H4EGTZVYkQYmwRim2AzOSTrrNLBHq4JsVQ&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw-_aKvSjl1qQBkFLNDteekjcIPWC0UgjnHA&s'
+ ),
  '这周末去了郊外踏青，风景很美，分享几张照片。',
  45, 10, 0,
  '2025-06-28 18:42:10', '2025-06-28 18:50:05', 0),
@@ -118,9 +120,17 @@ https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fpic.pngs
 -- 示例 4：9 张图片上限测试
 (@yangId,
  '美食分享',
- 'https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA,
-        https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA,
-        https://www.google.com/imgres?q=%E5%8F%AF%E7%88%B1&imgurl=https%3A%2F%2Fimgs.699pic.com%2Fimages%2F402%2F682%2F282.jpg!detail.v1&imgrefurl=https%3A%2F%2F699pic.com%2Ftupian-402682282.html&docid=E8Sffw4qAzCAoM&tbnid=VOLIlMaViHPTkM&vet=12ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA..i&w=860&h=1142&hcb=2&ved=2ahUKEwi4ra71zZuOAxXnklYBHYsvBYAQM3oECE8QAA',
+ CONCAT_WS(' ',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlw3ae9xZJfONtGrG3oZ_n3gW0Ye3TO8Ecg&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_OSf_8Koet-8U45jV_KUU7fmT_fuUA-G_Vg&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlnEAdxkP5kLegY3xl2naYNbzcZQ91R1HiOg&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQh2enDQfvL_wJUEbjMPwSDouUHyfFxGlwaUw&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzBB899PODFTkry-A9768KylDDofNVk64G9w&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTsOloJ4xI4XGRQ0yQmwNYXcDmhwj-U8EWfQ&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQarAtotkbKIdSCPYPkTY1tsXprHVd67pTz2g&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-AHJmFiZJopCgHt_g5zOIrjBQub1hiwh0QQ&s',
+           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcllweQxEbELhkJseGM9NHSrI4H7yDFYlUug&s'
+ ),
  '今天在家做了九种小吃，味道不错，大家可以参考我的做法。',
  88, 22, 0,
  '2025-06-25 12:30:00', '2025-06-25 12:45:10', 0),
