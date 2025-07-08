@@ -1,6 +1,5 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.blog.response.BlogListResponseVO;
 import com.unswit.usercenter.model.domain.Blog;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -12,7 +11,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface BlogService extends IService<Blog> {
 
-    Result likeBlog(Long id);
+    Long likeBlog(Long id);
 
     BlogListResponseVO getListBlogs(int page, int size);
 

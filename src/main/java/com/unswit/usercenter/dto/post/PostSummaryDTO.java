@@ -22,6 +22,14 @@ public class BlogSummaryDTO {
      */
     private String content;
     /**
+     * 点赞数量
+     */
+    private Integer likeCount;
+    /**
+     * 评论数量
+     */
+    private Integer commentCount;
+    /**
      * 更新时间
      */
     private Date updateTime;

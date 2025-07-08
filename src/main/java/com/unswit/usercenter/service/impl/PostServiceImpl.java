@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.blog.response.BlogListResponseVO;
 import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
 import com.unswit.usercenter.mapper.UserMapper;
@@ -37,7 +36,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     private UserMapper userMapper;
 
     @Override
-    public Result likeBlog(Long id) {
+    public Long likeBlog(Long id) {
         //1.获取登陆用户
         String userId = UserHolder.getUser().getId();
 
@@ -47,7 +46,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         if(BooleanUtil.isFalse(isMember)){
             //4.未点赞的话点赞数+1
             //4.1 数据库点赞呢 +1
-            boolean isSuccess = update().setSql("liked= liked+1").eq("id", id).update();
+            boolean isSuccess = update().setSql("likeCount= likeCount+1").eq("id", id).update();
             //4.2 保存用户到redis的set集合
             if (isSuccess) {
                 stringRedisTemplate.opsForSet().add(key, userId);
@@ -55,14 +54,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }else{
             //3.如果已经点赞，点赞数-1
             //3.1数据库点赞数-1
-            boolean isSuccess = update().setSql("liked= liked-1").eq("id", id).update();
+            boolean isSuccess = update().setSql("likeCount= likeCount-1").eq("id", id).update();
             //3.2 把用户从set集合中删除
             if (isSuccess) {
                 stringRedisTemplate.opsForSet().remove(key, userId);
             }
         }
 
-        return Result.ok();
+        return id;
 
     }
 
@@ -76,8 +75,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         );
         List<Blog> blogs = blogPage.getRecords();
 
-        System.out.println("total"+blogPage.getTotal());
-
         // 2. 转换为 DTO 列表
         List<BlogSummaryDTO> listblogs = blogs.stream().map(blog -> {
             String userId = blog.getUserId();
@@ -90,18 +87,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                     ).map(User::getUserName)
                     .orElse("匿名用户");
 
-            BlogSummaryDTO dto = new BlogSummaryDTO();
-            dto.setId(blog.getId());
-            dto.setTitle(blog.getTitle());
-            dto.setAuthor(userName);
-            dto.setUpdateTime(blog.getUpdateTime());
-            String content = blog.getContent();
-            dto.setContent(
-                    content.length() > 50
-                            ? content.substring(0, 50) + "…"
-                            : content
-            );
-            return dto;
+            return getBlogSummaryDTO(blog, userName);
         }).collect(Collectors.toList());
 
         // 3. 封装返回
@@ -109,6 +95,23 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         response.setBlogSumList(listblogs);
         response.setTotal((int) blogPage.getTotal());
         return response;
+    }
+
+    private static BlogSummaryDTO getBlogSummaryDTO(Blog blog, String userName) {
+        BlogSummaryDTO dto = new BlogSummaryDTO();
+        dto.setId(blog.getId());
+        dto.setTitle(blog.getTitle());
+        dto.setAuthor(userName);
+        dto.setLikeCount(blog.getLikeCount());
+        dto.setCommentCount(blog.getCommentCount());
+        dto.setUpdateTime(blog.getUpdateTime());
+        String content = blog.getContent();
+        dto.setContent(
+                content.length() > 50
+                        ? content.substring(0, 50) + "…"
+                        : content
+        );
+        return dto;
     }
 
 }

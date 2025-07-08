@@ -67,8 +67,9 @@ public class BlogController {
      * @return
      */
     @PutMapping("/like/{id}")
-    public Result likeBlog(@PathVariable("id") Long id) {
-        return blogService.likeBlog(id);
+    public BaseResponse likeBlog(@PathVariable("id") Long id) {
+        Long blogId = blogService.likeBlog(id);
+        return ResultUtils.success(blogId);
     }
 
 
