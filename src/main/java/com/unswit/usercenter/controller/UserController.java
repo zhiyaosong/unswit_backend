@@ -123,7 +123,7 @@ public class UserController {
         cookie.setMaxAge((int) TimeUnit.MINUTES.toSeconds(30)); // 30 分钟过期
 
         response.addCookie(cookie);
-        System.out.println("已加入cookie");
+
         return ResultUtils.success("ok");
     }
 
@@ -235,13 +235,13 @@ public class UserController {
         return Result.ok(noteSummary);
     }
 
-    @GetMapping("account/center/blog")
-    public Result getMyBlog() {
+    @GetMapping("account/center/post")
+    public Result getMyPost() {
         String userId = UserHolder.getUser().getId();
         if (userId==null) {
             return Result.fail("用户未登陆");
         }
-        userService.getBlogSummary(userId);
+        userService.getPostSummary(userId);
         return Result.ok();
     }
 

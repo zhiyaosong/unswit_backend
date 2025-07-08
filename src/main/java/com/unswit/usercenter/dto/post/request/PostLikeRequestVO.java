@@ -1,11 +1,11 @@
-package com.unswit.usercenter.dto.note.request;
+package com.unswit.usercenter.dto.post.request;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class NoteLikeRequestVO {
+public class PostLikeRequestVO {
     private String userId;
-    private List<Long> noteIds;
+    private List<Long> postIds;
 }

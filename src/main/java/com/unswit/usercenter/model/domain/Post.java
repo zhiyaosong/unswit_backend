@@ -8,11 +8,11 @@ import lombok.Data;
 
 /**
  * 帖子
- * @TableName blog
+ * @TableName post
  */
-@TableName(value ="blog")
+@TableName(value ="post")
 @Data
-public class Blog {
+public class Post {
     /**
      * 帖子id
      */

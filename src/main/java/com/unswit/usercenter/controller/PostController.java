@@ -1,15 +1,20 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.unswit.usercenter.dto.blog.response.BlogComResponseVO;
-import com.unswit.usercenter.dto.blog.response.BlogListResponseVO;
+import com.unswit.usercenter.dto.post.request.PostLikeRequestVO;
+import com.unswit.usercenter.dto.post.request.ToggleLikePostRequestVO;
+import com.unswit.usercenter.dto.post.response.PostComResponseVO;
+import com.unswit.usercenter.dto.post.response.PostLikeResponseVO;
+import com.unswit.usercenter.dto.post.response.PostListResponseVO;
+import com.unswit.usercenter.dto.post.response.ToggleLikePostResponseVO;
+import com.unswit.usercenter.service.UserPostLikesService;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
-import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
-import com.unswit.usercenter.model.domain.Blog;
-import com.unswit.usercenter.service.BlogCommentsService;
-import com.unswit.usercenter.service.BlogService;
+import com.unswit.usercenter.model.domain.Post;
+import com.unswit.usercenter.service.PostCommentsService;
+import com.unswit.usercenter.service.PostService;
 import com.unswit.usercenter.utils.SystemConstants;
 import com.unswit.usercenter.utils.UserHolder;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,46 +22,49 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
-@Tag(name = "Blog接口", description = "Blog增删改查接口")
+@Tag(name = "Post接口", description = "Post增删改查接口")
 @RestController
-@RequestMapping("/blogs")
-public class BlogController {
+@RequestMapping("/posts")
+public class PostController {
     @Resource
-    private BlogService blogService;
+    private PostService postService;
     @Resource
-    private BlogCommentsService blogCommentsService;
+    private PostCommentsService postCommentsService;
+    @Resource
+    private UserPostLikesService userPostLikesService;
 
     /**
-     * 新增blog
-     * @param blog
+     * 新增post
+     * @param post
      * @return
      */
     @PostMapping("/add")
-    public BaseResponse<Long> saveBlog(@RequestBody Blog blog) {
+    public BaseResponse<Long> savepost(@RequestBody Post post) {
         // 获取登录用户
         UserSimpleDTO user = UserHolder.getUser();
-        blog.setUserId(user.getId());
+        post.setUserId(user.getId());
         // 保存博文
-        blogService.save(blog);
+        postService.save(post);
         // 返回id
-        return ResultUtils.success(blog.getId());
+        return ResultUtils.success(post.getId());
     }
 
     /**
-     * 获取自己发布的blog
+     * 获取自己发布的post
      * @param current
      * @return
      */
     @GetMapping("/of/me")
-    public BaseResponse<List<Blog>> queryMyBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
+    public BaseResponse<List<Post>> queryMypost(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         // 获取登录用户
         UserSimpleDTO user = UserHolder.getUser();
         // 根据用户查询
-        Page<Blog> page = blogService.query()
+        Page<Post> page = postService.query()
                 .eq("user_id", user.getId()).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
         // 获取当前页数据
-        List<Blog> records = page.getRecords();
+        List<Post> records = page.getRecords();
         return ResultUtils.success(records);
     }
 
@@ -67,37 +75,77 @@ public class BlogController {
      * @return
      */
     @PutMapping("/like/{id}")
-    public BaseResponse likeBlog(@PathVariable("id") Long id) {
-        Long blogId = blogService.likeBlog(id);
-        return ResultUtils.success(blogId);
+    public BaseResponse likePost(@PathVariable("id") Long id) {
+        Long postId = postService.likePost(id);
+        return ResultUtils.success(postId);
+    }
+
+    /**
+     * BaseResponse<String> likePost 获取帖子点赞信息
+     * @param req
+     * @return postLikesResponseDTO
+     */
+    @PostMapping("likes")
+    public BaseResponse<PostLikeResponseVO> getLikes(@RequestBody PostLikeRequestVO req) {
+
+        String userId = req.getUserId();
+        List<Long> postIds = req.getPostIds();
+        if (userId == null || postIds == null || postIds.isEmpty()) {
+            return ResultUtils.error(ErrorCode.NULL_ERROR);
+        }
+        // 1. 查询总点赞数
+        Map<Long, Integer> likes = postService.getLikeCounts(postIds);
+        // 2. 查询当前用户是否已点赞
+        Map<Long, Boolean> likedByUser = postService.getUserLikedStatus(userId, postIds);
+
+        // 3. 组装返回
+        PostLikeResponseVO resp = new PostLikeResponseVO();
+        resp.setLikes(likes);
+        resp.setLikedByUser(likedByUser);
+
+        return ResultUtils.success(resp);
+    }
+
+    /**
+     * 切换点赞（如果之前已点赞则取消，否则就点赞）。
+     * POST /api/note/like?userId=xxx
+     * Body: { "noteId": 123 }
+     */
+    @PostMapping("/like")
+    public BaseResponse<ToggleLikePostResponseVO> toggleLike(
+            @RequestBody ToggleLikePostRequestVO req
+    ) {
+        ToggleLikePostResponseVO resp = userPostLikesService.toggleLike(req);
+        return ResultUtils.success(resp);
     }
 
 
     /**
-     * 展示某一篇blog详情界面
-     * @param blogId
+     * 展示某一篇post详情界面
+     * @param postId
      * @return
      */
     // TODO: 增加错误处理
-    @GetMapping("/{blogId}")
-    public BaseResponse<BlogComResponseVO> getBlog(@PathVariable Long blogId) {
+    @GetMapping("/{postId}")
+    public BaseResponse<PostComResponseVO> getPost(@PathVariable Long postId) {
 
-        return ResultUtils.success(blogCommentsService.getBlogComments(blogId));
+        return ResultUtils.success(postCommentsService.getPostComments(postId));
     }
 
     /**
-     * 展示一个页单位所有blog（无comment）
-     * 只返回blog
+     * 展示一个页单位所有post（无comment）
+     * 只返回post
      * 将代码逻辑写在service里面
      * @param page
      * @param size
      * @return
      */
     @GetMapping({ "", "/" })
-    public BaseResponse<BlogListResponseVO> listBlogs(@RequestParam(defaultValue = "1") int page,
+    public BaseResponse<PostListResponseVO> listposts(@RequestParam(defaultValue = "1") int page,
                                                       @RequestParam(defaultValue = "5") int size) {
-        BlogListResponseVO listBlogs = blogService.getListBlogs(page, size);
-        return ResultUtils.success(listBlogs);
+        PostListResponseVO listPosts = postService.getListPosts(page, size);
+        System.out.println(listPosts);
+        return ResultUtils.success(listPosts);
     }
 
 

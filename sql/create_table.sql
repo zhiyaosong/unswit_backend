@@ -11,8 +11,11 @@ drop table if exists user_note_likes;
 drop table if exists note;
 drop table if exists course;
 drop table if exists blog_comments;
+drop table if exists post_comments;
 drop table if exists user_blog_likes;
+drop table if exists user_post_likes;
 drop table if exists blog;
+drop table if exists post;
 drop table if exists user;
 
 # 用户表
@@ -109,7 +112,7 @@ END$$
 DELIMITER ;
 
 # 帖子表
-create table if not exists `blog`
+create table if not exists `post`
 (
     id           bigint auto_increment primary key comment '帖子id',
     userId       char(32)      not null comment 'id,UUID（无中划线32位）' ,
@@ -127,12 +130,12 @@ create table if not exists `blog`
 )comment '帖子';
 
 
-# blog comments
-CREATE TABLE if not exists `blog_comments`
+# post comments
+CREATE TABLE if not exists `post_comments`
 (
     id          bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     userId      char(32)  not null comment 'id,UUID（无中划线32位）' ,
-    blogId      bigint  NOT NULL COMMENT 'blog_id',
+    postId      bigint  NOT NULL COMMENT 'post_id',
     parentId    bigint(20) UNSIGNED NULL COMMENT '关联的1级评论id，如果是一级评论，则值为NULL',
     content     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
     status      tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
@@ -140,58 +143,58 @@ CREATE TABLE if not exists `blog_comments`
     updateTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id) USING BTREE,
     CONSTRAINT fk_comment_user FOREIGN KEY (userId) REFERENCES user(id),
-    CONSTRAINT fk_comment_blog FOREIGN KEY (blogId) REFERENCES blog(id),
-    CONSTRAINT fk_comment_parent FOREIGN KEY (parentId) REFERENCES blog_comments(id) ON DELETE CASCADE
-)comment 'blog comments' ;
+    CONSTRAINT fk_comment_post FOREIGN KEY (postId) REFERENCES post(id),
+    CONSTRAINT fk_comment_parent FOREIGN KEY (parentId) REFERENCES post_comments(id) ON DELETE CASCADE
+)comment 'post comments' ;
 
 
-create table if not exists user_blog_likes
+create table if not exists user_post_likes
 (
     userId          char(32)              NOT NULL,
-    blogId          BIGINT                NOT NULL,
+    postId          BIGINT                NOT NULL,
     likedAt         TIMESTAMP   DEFAULT   CURRENT_TIMESTAMP,
-    PRIMARY KEY (userId, blogId),
+    PRIMARY KEY (userId, postId),
     FOREIGN KEY (userId) REFERENCES user(id),
-    FOREIGN KEY (blogId) REFERENCES blog(id)
+    FOREIGN KEY (postId) REFERENCES post(id)
 ) comment '用户帖子点赞表';
 
-# blog.likeCount的触发器
+# post.likeCount的触发器
 DELIMITER $$
-CREATE TRIGGER trg_blog_like_insert
-    AFTER INSERT ON user_blog_likes
+CREATE TRIGGER trg_post_like_insert
+    AFTER INSERT ON user_post_likes
     FOR EACH ROW
 BEGIN
-    UPDATE blog
+    UPDATE post
     SET likeCount = likeCount + 1
-    WHERE id = NEW.blogId;
+    WHERE id = NEW.postId;
 END$$
 
-CREATE TRIGGER trg_blog_like_delete
-    AFTER DELETE ON user_blog_likes
+CREATE TRIGGER trg_post_like_delete
+    AFTER DELETE ON user_post_likes
     FOR EACH ROW
 BEGIN
-    UPDATE blog
+    UPDATE post
     SET likeCount = likeCount - 1
-    WHERE id = OLD.blogId;
+    WHERE id = OLD.postId;
 END$$
 
-# blog.commentCount的触发器
-CREATE TRIGGER trg_blog_comment_insert
-    AFTER INSERT ON blog_comments
+# post.commentCount的触发器
+CREATE TRIGGER trg_post_comment_insert
+    AFTER INSERT ON post_comments
     FOR EACH ROW
 BEGIN
-    UPDATE blog
+    UPDATE post
     SET commentCount = commentCount + 1
-    WHERE id = NEW.blogId;
+    WHERE id = NEW.postId;
 END$$
 
-CREATE TRIGGER trg_blog_comment_delete
-    AFTER DELETE ON blog_comments
+CREATE TRIGGER trg_post_comment_delete
+    AFTER DELETE ON post_comments
     FOR EACH ROW
 BEGIN
-    UPDATE blog
+    UPDATE post
     SET commentCount = commentCount - 1
-    WHERE id = OLD.blogId;
+    WHERE id = OLD.postId;
 END$$
 DELIMITER ;
 

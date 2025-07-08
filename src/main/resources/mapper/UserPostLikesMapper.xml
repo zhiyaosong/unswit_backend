@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unswit.usercenter.mapper.UserPostLikesMapper">
+
+    <resultMap id="UserPostLikesMap" type="com.unswit.usercenter.model.domain.UserPostLikes">
+            <id property="userId" column="userId" />
+            <id property="postId" column="postId" />
+            <result property="likedAt" column="likedAt" />
+    </resultMap>
+
+    <!-- 2. 根据复合主键查询 -->
+    <select id="selectById" resultMap="UserPostLikesMap">
+        SELECT userId, postId, likedAt
+        FROM user_post_likes
+        WHERE userId = #{userId}
+          AND postId = #{postId}
+    </select>
+
+    <!-- 3. 插入 -->
+    <insert id="insert" parameterType="com.unswit.usercenter.model.domain.UserPostLikes">
+        INSERT INTO user_post_likes
+            (userId, postId, likedAt)
+        VALUES
+            (#{userId}, #{postId}, #{likedAt})
+    </insert>
+
+    <!-- 4. 删除 -->
+    <delete id="deleteById" parameterType="com.unswit.usercenter.model.domain.UserPostLikes">
+        DELETE FROM user_post_likes
+        WHERE userId = #{userId}
+          AND postId = #{postId}
+    </delete>
+
+    <sql id="Base_Column_List">
+        userId,postId,likedAt
+    </sql>
+</mapper>

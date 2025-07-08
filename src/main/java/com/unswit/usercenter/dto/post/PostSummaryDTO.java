@@ -1,20 +1,20 @@
-package com.unswit.usercenter.dto.blog;
+package com.unswit.usercenter.dto.post;
 
 import lombok.Data;
 
 import java.util.Date;
 @Data
-public class BlogSummaryDTO {
+public class PostSummaryDTO {
     /**
      * 发布blog的用户名
      */
     private String author;
     /**
-     * blog id
+     * post id
      */
     private Long id;
     /**
-     * blog title
+     * post title
      */
     private String title;
     /**

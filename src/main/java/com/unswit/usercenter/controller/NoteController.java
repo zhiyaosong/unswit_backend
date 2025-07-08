@@ -8,9 +8,9 @@ import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.note.request.AddNoteRequestVO;
 import com.unswit.usercenter.dto.note.request.NoteLikeRequestVO;
 import com.unswit.usercenter.dto.note.request.NoteRequestVO;
-import com.unswit.usercenter.dto.note.request.ToggleLikeRequestVO;
+import com.unswit.usercenter.dto.note.request.ToggleLikeNoteRequestVO;
 import com.unswit.usercenter.dto.note.response.NoteLikeResponseVO;
-import com.unswit.usercenter.dto.note.ToggleLikeResponseDTO;
+import com.unswit.usercenter.dto.note.response.ToggleLikeNoteResponseVO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.model.domain.Note;
@@ -40,7 +40,7 @@ public class NoteController {
     @Resource
     private UserNoteLikesService userNoteLikesService;
 
-    @Autowired
+    @Resource
     private NoteMapper noteMapper;
 
 
@@ -139,10 +139,10 @@ public class NoteController {
      * Body: { "noteId": 123 }
      */
     @PostMapping("/like")
-    public BaseResponse<ToggleLikeResponseDTO> toggleLike(
-            @RequestBody ToggleLikeRequestVO req
+    public BaseResponse<ToggleLikeNoteResponseVO> toggleLike(
+            @RequestBody ToggleLikeNoteRequestVO req
     ) {
-        ToggleLikeResponseDTO resp = userNoteLikesService.toggleLike(req);
+        ToggleLikeNoteResponseVO resp = userNoteLikesService.toggleLike(req);
         return ResultUtils.success(resp);
     }
 }

@@ -1,8 +1,8 @@
 package com.unswit.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.dto.note.request.ToggleLikeRequestVO;
-import com.unswit.usercenter.dto.note.ToggleLikeResponseDTO;
+import com.unswit.usercenter.dto.note.request.ToggleLikeNoteRequestVO;
+import com.unswit.usercenter.dto.note.response.ToggleLikeNoteResponseVO;
 import com.unswit.usercenter.mapper.NoteMapper;
 import com.unswit.usercenter.model.domain.UserNoteLikes;
 import com.unswit.usercenter.service.UserNoteLikesService;
@@ -29,7 +29,7 @@ public class UserNoteLikesServiceImpl extends ServiceImpl<UserNoteLikesMapper, U
 
     @Override
     @Transactional
-    public ToggleLikeResponseDTO toggleLike(ToggleLikeRequestVO req){
+    public ToggleLikeNoteResponseVO toggleLike(ToggleLikeNoteRequestVO req){
         String userId = req.getUserId();
         Long noteId = req.getNoteId();
 
@@ -55,7 +55,7 @@ public class UserNoteLikesServiceImpl extends ServiceImpl<UserNoteLikesMapper, U
         int currentCount = noteMapper.selectById(noteId).getLikeCount();
 
         // 3. 构造返回 DTO
-        ToggleLikeResponseDTO resp = new ToggleLikeResponseDTO();
+        ToggleLikeNoteResponseVO resp = new ToggleLikeNoteResponseVO();
         resp.setLiked(nowLiked);
         resp.setLikes(currentCount);
         return resp;

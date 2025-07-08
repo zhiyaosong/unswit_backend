@@ -1,9 +1,9 @@
-package com.unswit.usercenter.dto.note.request;
+package com.unswit.usercenter.dto.post.request;
 
 import lombok.Data;
 
 @Data
-public class ToggleLikeRequestVO {
+public class ToggleLikePostRequestVO {
     private String userId;
-    private Long noteId;
+    private Long postId;
 }

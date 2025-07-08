@@ -2,12 +2,12 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.unswit.usercenter.mapper.BlogCommentsMapper">
+<mapper namespace="com.unswit.usercenter.mapper.PostCommentsMapper">
 
-    <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.BlogComments">
+    <resultMap id="BaseResultMap" type="com.unswit.usercenter.model.domain.PostComments">
             <id property="id" column="id" />
             <result property="userId" column="userId" />
-            <result property="blogId" column="blogId" />
+            <result property="postId" column="postId" />
             <result property="parentId" column="parentId" />
             <result property="content" column="content" />
             <result property="status" column="status" />
@@ -16,7 +16,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,userId,blogId,parentId,content,status,
+        id,userId,postId,parentId,content,status,
         createTime,updateTime
     </sql>
 </mapper>

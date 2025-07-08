@@ -85,7 +85,7 @@ VALUES
 ;
 
 
-INSERT INTO `blog` (
+INSERT INTO `post` (
     `userId`, `title`, `images`, `content`,
     `likeCount`, `commentCount`, `status`,
     `createTime`, `updateTime`, `isDelete`
@@ -145,8 +145,8 @@ INSERT INTO `blog` (
 
 
 -- 1) 先插入所有 parentId = 0 的“一级评论”
-INSERT INTO `blog_comments`
-(userId, blogId, parentId, content, status, createTime, updateTime)
+INSERT INTO `post_comments`
+(userId, postId, parentId, content, status, createTime, updateTime)
 VALUES
     (@yangId, 1, null, '这篇文章写得很详细，受益匪浅！', 0, '2025-06-20 10:15:00', '2025-06-20 10:15:00'),
     (@yangId, 1, null, '请问作者能否分享一下数据来源？', 0, '2025-06-20 11:05:23', '2025-06-20 11:05:23'),
@@ -155,8 +155,8 @@ VALUES
     (@yangId, 2, null, '内容有误，第 2 节标题写反了。',    1, '2025-06-21 10:00:00', '2025-06-21 10:00:00');
 
 -- 2) 然后再插入那些 parentId ≠ 0 的“二级回复”
-INSERT INTO `blog_comments`
-(userId, blogId, parentId, content, status, createTime, updateTime)
+INSERT INTO `post_comments`
+(userId, postId, parentId, content, status, createTime, updateTime)
 VALUES
     (@yangId, 1, 1, '@a1b2c3… 我也是遇到同样的问题，可以看一下官方文档提供的示例。', 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00'),
     (@yangId, 1, 1, '作者回复：感谢支持，数据来源已在文末补充。',                   0, '2025-06-20 14:22:10', '2025-06-20 14:22:10'),

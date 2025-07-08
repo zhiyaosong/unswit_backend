@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.blog.request;
+package com.unswit.usercenter.dto.post.request;
 
-public class AddBlogRequestVO {
+public class AddPostRequestVO {
 }

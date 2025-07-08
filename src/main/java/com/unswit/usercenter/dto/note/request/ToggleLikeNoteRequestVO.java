@@ -3,7 +3,7 @@ package com.unswit.usercenter.dto.note.request;
 import lombok.Data;
 
 @Data
-public class ToggleLikeRequestVO {
+public class ToggleLikeNoteRequestVO {
     private String userId;
     private Long noteId;
 }

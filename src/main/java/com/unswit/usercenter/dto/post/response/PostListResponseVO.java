@@ -1,12 +1,12 @@
-package com.unswit.usercenter.dto.blog.response;
+package com.unswit.usercenter.dto.post.response;
 
-import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
+import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class BlogListResponseVO {
-    private List<BlogSummaryDTO> BlogSumList;
+public class PostListResponseVO {
+    private List<PostSummaryDTO> PostSumList;
     private int total;
 }

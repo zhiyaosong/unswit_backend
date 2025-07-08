@@ -1,18 +1,18 @@
-package com.unswit.usercenter.dto.blog.response;
+package com.unswit.usercenter.dto.post.response;
 
-import com.unswit.usercenter.dto.blog.BlogDetailsDTO;
-import com.unswit.usercenter.dto.blog.CommentDTO;
+import com.unswit.usercenter.dto.post.PostDetailsDTO;
+import com.unswit.usercenter.dto.post.CommentDTO;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class BlogComResponseVO implements Serializable {
+public class PostComResponseVO implements Serializable {
     /**
      * 博客内容
      */
-    private BlogDetailsDTO blog;
+    private PostDetailsDTO post;
 
     /**
      * 评论列表（包含子评论）

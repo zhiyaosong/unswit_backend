@@ -10,12 +10,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * blog comments
- * @TableName blog_comments
+ * post comments
+ * @TableName post_comments
  */
-@TableName(value = "blog_comments")
+@TableName(value = "post_comments")
 @Data
-public class BlogComments {
+public class PostComments {
 
     /**
      * 主键
@@ -29,10 +29,10 @@ public class BlogComments {
     private String userId;
 
     /**
-     * blog_id
+     * post_id
      */
-    @TableField("blogId")
-    private Long blogId;
+    @TableField("postId")
+    private Long postId;
 
     /**
      * 关联的1级评论id，如果是一级评论，则值为null
@@ -64,6 +64,6 @@ public class BlogComments {
 
     // 用于嵌套二级评论（非数据库字段）
     @TableField(exist = false)
-    private List<BlogComments> children;
+    private List<PostComments> children;
 
 }

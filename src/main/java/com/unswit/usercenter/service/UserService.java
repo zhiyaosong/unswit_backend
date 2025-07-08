@@ -1,7 +1,7 @@
 package com.unswit.usercenter.service;
 
 import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
-import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
+import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -46,6 +46,6 @@ public interface UserService extends IService<User> {
 
     List<NoteSummaryDTO> getNoteSummary(String userId);
 
-    List<BlogSummaryDTO> getBlogSummary(String userId);
+    List<PostSummaryDTO> getPostSummary(String userId);
 
 }

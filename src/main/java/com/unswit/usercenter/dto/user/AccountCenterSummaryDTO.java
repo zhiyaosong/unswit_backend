@@ -11,7 +11,7 @@ public class AccountCenterSummaryDTO {
     /**
      * 帖子量
      */
-    private Long blogCount;
+    private Long postCount;
     /**
      * 点赞量
      */

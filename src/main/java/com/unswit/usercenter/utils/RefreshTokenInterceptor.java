@@ -7,13 +7,14 @@ import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class RefreshTokenInterceptor implements HandlerInterceptor {
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
@@ -21,9 +22,20 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 获取请求头中的token
-        String token = request.getHeader("authorization");
+        String token = "";
+        // String token = request.getHeader("authorization");
+        // 获取Cookie中的token
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null){
+            for (Cookie cookie : cookies){
+                if (cookie.getName().equals("access_token")){
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
         if (StrUtil.isBlank(token)) {
+            System.out.println("token is null");
             return true;
         }
         // 基于token获得redis中的用户
@@ -49,6 +61,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 
         //移除用户
+        System.out.println("移除用户从ThreadLocal中");
         UserHolder.removeUser();
     }
 }

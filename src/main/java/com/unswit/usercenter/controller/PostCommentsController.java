@@ -1,9 +1,9 @@
 package com.unswit.usercenter.controller;
 
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.blog.request.BlogCommentRequestVO;
-import com.unswit.usercenter.model.domain.BlogComments;
-import com.unswit.usercenter.service.BlogCommentsService;
+import com.unswit.usercenter.dto.post.request.PostCommentRequestVO;
+import com.unswit.usercenter.model.domain.PostComments;
+import com.unswit.usercenter.service.PostCommentsService;
 import com.unswit.usercenter.utils.UserHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,27 +12,27 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/comments")
-public class BlogCommentsController {
+public class PostCommentsController {
     @Resource
-    private BlogCommentsService blogCommentsService;
+    private PostCommentsService postCommentsService;
     /**
      * 发布评论接口
      * @param
      * @return
      */
     @PostMapping("/add")
-    public Result addComment(@RequestBody BlogCommentRequestVO dto) {
+    public Result addComment(@RequestBody PostCommentRequestVO dto) {
         String id = UserHolder.getUser().getId();
-        BlogComments comment = new BlogComments();
+        PostComments comment = new PostComments();
         comment.setContent(dto.getContent());
-        comment.setBlogId(dto.getBlogId());
+        comment.setPostId(dto.getPostId());
         comment.setUserId(id);
         comment.setCreateTime(new Date());
         comment.setUpdateTime(new Date());
         comment.setParentId(dto.getParentId());
         comment.setStatus(0);
 
-        blogCommentsService.save(comment);
+        postCommentsService.save(comment);
         return Result.ok();
     }
 
@@ -47,7 +47,7 @@ public class BlogCommentsController {
         String userId = UserHolder.getUser().getId(); // 获取当前登录用户ID
 
         // 1. 查询评论是否存在且属于当前用户
-        BlogComments comment = blogCommentsService.getById(commentId);
+        PostComments comment = postCommentsService.getById(commentId);
         if (comment == null) {
             return Result.fail("评论不存在");
         }
@@ -56,7 +56,7 @@ public class BlogCommentsController {
         }
 
         // 2. 删除评论（若是一级评论，会自动级联删除子评论，需数据库支持）
-        blogCommentsService.removeById(commentId);
+        postCommentsService.removeById(commentId);
         return Result.ok("删除成功");
     }
 }

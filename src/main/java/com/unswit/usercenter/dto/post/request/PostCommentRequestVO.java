@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.blog.request;
+package com.unswit.usercenter.dto.post.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,12 +9,12 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BlogCommentRequestVO implements Serializable {
+public class PostCommentRequestVO implements Serializable {
 
     /**
      * 博客 ID
      */
-    private Long blogId;
+    private Long postId;
 
     /**
      * 关联的一级评论 ID，如果是一级评论，则值为 0

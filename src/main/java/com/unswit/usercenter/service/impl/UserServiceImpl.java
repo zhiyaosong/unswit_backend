@@ -9,12 +9,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
-import com.unswit.usercenter.dto.blog.BlogSummaryDTO;
+import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
-import com.unswit.usercenter.mapper.BlogMapper;
+import com.unswit.usercenter.mapper.PostMapper;
 import com.unswit.usercenter.mapper.NoteMapper;
-import com.unswit.usercenter.model.domain.Blog;
+import com.unswit.usercenter.model.domain.Post;
 import com.unswit.usercenter.model.domain.Note;
 import com.unswit.usercenter.model.domain.User;
 import com.unswit.usercenter.service.UserService;
@@ -58,7 +58,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     private static final String SALT = "unswit";
     @Autowired
-    private BlogMapper blogMapper;
+    private PostMapper postMapper;
     @Autowired
     private NoteMapper noteMapper;
 
@@ -201,8 +201,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //保存用户到Redis
         //1.生成token，生成登陆令牌
         String token = UUID.randomUUID().toString(true);
-        //2.将User对象转为Hash存储， userDTO里只有id和userName
+        //2.将User对象转为Hash存储， userSimpleDTO里只有id和userName
         UserSimpleDTO userSimpleDTO = BeanUtil.copyProperties(user, UserSimpleDTO.class);
+        // 属性名和属性值的映射
         Map<String, Object> userMap = BeanUtil.beanToMap(
                 userSimpleDTO,
                 new HashMap<>(),
@@ -254,9 +255,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 给 userSessionsKey 同步更新过期时间
         stringRedisTemplate.expire(userSessionsKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
 
-        //返回token给客户端
-        System.out.println("返回token给客户端");
-        //return Result.ok(token);
         return token;
     }
 
@@ -303,10 +301,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public AccountCenterSummaryDTO getAccountCenterSummary(String userId) {
-        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        QueryWrapper<Post> wrapper = new QueryWrapper<>();
         wrapper.eq("userId", userId)
                 .eq("isDelete",0);
-        Long blogCount = blogMapper.selectCount(wrapper);
+        Long postCount = postMapper.selectCount(wrapper);
 
         QueryWrapper<Note> noteQueryWrapper = new QueryWrapper<>();
         noteQueryWrapper.eq("userId", userId)
@@ -322,7 +320,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Long totalLikes = result.get("totalLikes") != null ? ((Number) result.get("totalLikes")).longValue(): 0;
 
         AccountCenterSummaryDTO dto = new AccountCenterSummaryDTO();
-        dto.setBlogCount(blogCount);
+        dto.setPostCount(postCount);
         dto.setNoteCount(noteCount);
         dto.setLikeCount(totalLikes);
 
@@ -352,20 +350,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public List<BlogSummaryDTO> getBlogSummary(String userId) {
-        List<Blog> blogs = blogMapper.selectList(
-                new QueryWrapper<Blog>()
+    public List<PostSummaryDTO> getPostSummary(String userId) {
+        List<Post> posts = postMapper.selectList(
+                new QueryWrapper<Post>()
                         .eq("userId", userId)
                         .eq("isDelete", 0)
                         .eq("status", 0)
                         .orderByDesc("updateTime")
         );
-        List<BlogSummaryDTO> dtoList = blogs.stream().map(blog -> {
-            BlogSummaryDTO dto = new BlogSummaryDTO();
-            dto.setTitle(blog.getTitle());
-            dto.setUpdateTime(blog.getUpdateTime());
-            dto.setId(blog.getId());
-            String content = blog.getContent();
+        List<PostSummaryDTO> dtoList = posts.stream().map(post -> {
+            PostSummaryDTO dto = new PostSummaryDTO();
+            dto.setTitle(post.getTitle());
+            dto.setUpdateTime(post.getUpdateTime());
+            dto.setId(post.getId());
+            String content = post.getContent();
             dto.setContent(content.length()>50?content.substring(0,50)+"...":content);
 
             return dto;

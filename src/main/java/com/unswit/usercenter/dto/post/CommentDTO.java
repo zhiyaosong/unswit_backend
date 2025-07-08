@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.blog;
+package com.unswit.usercenter.dto.post;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class CommentDTO implements Serializable {
-    private Long blogId;
+    private Long postId;
 
     /**
      * 评论 ID

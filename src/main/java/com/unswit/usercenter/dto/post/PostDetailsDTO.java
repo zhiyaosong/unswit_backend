@@ -1,4 +1,4 @@
-package com.unswit.usercenter.dto.blog;
+package com.unswit.usercenter.dto.post;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class BlogDetailsDTO {
+public class PostDetailsDTO {
     private Long id;
 
     /**
