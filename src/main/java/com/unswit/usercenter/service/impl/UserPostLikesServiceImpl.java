@@ -3,10 +3,12 @@ package com.unswit.usercenter.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.dto.post.response.ToggleLikePostResponseVO;
 import com.unswit.usercenter.dto.post.request.ToggleLikePostRequestVO;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.mapper.PostMapper;
 import com.unswit.usercenter.model.domain.UserPostLikes;
 import com.unswit.usercenter.service.UserPostLikesService;
 import com.unswit.usercenter.mapper.UserPostLikesMapper;
+import com.unswit.usercenter.utils.UserHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,7 +30,8 @@ public class UserPostLikesServiceImpl extends ServiceImpl<UserPostLikesMapper, U
 
     @Override
     public ToggleLikePostResponseVO toggleLike(ToggleLikePostRequestVO req) {
-        String userId = req.getUserId();
+        UserSimpleDTO userSimpleDTO = UserHolder.getUser();
+        String userId = userSimpleDTO.getId();
         Long postId = req.getPostId();
 
         // 1. 检查是否已存在点赞记录
