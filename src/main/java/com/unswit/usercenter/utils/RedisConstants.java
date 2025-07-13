@@ -2,9 +2,9 @@ package com.unswit.usercenter.utils;
 
 public class RedisConstants {
     public static final String LOGIN_CODE_KEY = "login:code:";
-    public static final Long LOGIN_CODE_TTL = 2L;
+    public static final Long LOGIN_CODE_TTL = 180L; // 用的是minutes
     public static final String LOGIN_USER_KEY = "login:token:";
-    public static final Long LOGIN_USER_TTL = 3600L;
+    public static final Long LOGIN_USER_TTL = 180L;
 
     public static final Long CACHE_NULL_TTL = 2L;
 

@@ -133,14 +133,14 @@ create table if not exists `post`
 # post comments
 CREATE TABLE if not exists `post_comments`
 (
-    id          bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-    userId      char(32)  not null comment 'id,UUID（无中划线32位）' ,
-    postId      bigint  NOT NULL COMMENT 'post_id',
-    parentId    bigint(20) UNSIGNED NULL COMMENT '关联的1级评论id，如果是一级评论，则值为NULL',
+    id          bigint(20) UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    userId      char(32)             not null comment 'id,UUID（无中划线32位）' ,
+    postId      bigint               NOT NULL COMMENT 'post_id',
+    parentId    bigint(20)  UNSIGNED NULL default NULL COMMENT '关联的1级评论id，如果是一级评论，则值为null',
     content     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
-    status      tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
-    createTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updateTime  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    status      tinyint(1) UNSIGNED  NOT NULL DEFAULT 0 COMMENT '状态，0：正常，1：被举报，2：禁止查看',
+    createTime  timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updateTime  timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id) USING BTREE,
     CONSTRAINT fk_comment_user FOREIGN KEY (userId) REFERENCES user(id),
     CONSTRAINT fk_comment_post FOREIGN KEY (postId) REFERENCES post(id),

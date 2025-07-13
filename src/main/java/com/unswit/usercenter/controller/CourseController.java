@@ -30,7 +30,7 @@ public class CourseController {
     @PostMapping()
     public BaseResponse<Map<String, CategoryCourseDTO>> getAllCourseNote(@RequestBody UserIdRequestVO req) {
         String userId = req.getUserId();
-        System.out.println(userId);
+
         Map<String, CategoryCourseDTO> allCourseNote = courseService.getAllCourseNote(userId);
         if (allCourseNote.isEmpty()) {
             return ResultUtils.error(ErrorCode.NULL_ERROR);

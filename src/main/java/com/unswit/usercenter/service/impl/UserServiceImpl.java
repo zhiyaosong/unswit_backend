@@ -72,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(tokenKey);
         // 将 Redis 里的 Map 再转回 UserDTO
         UserSimpleDTO userSimpleDTO = BeanUtil.mapToBean(userMap, UserSimpleDTO.class, true);
-        System.out.println(userSimpleDTO);
+
         // 校验用户是否合法
         String userId = userSimpleDTO.getId();
         User user = userMapper.selectById(userId);

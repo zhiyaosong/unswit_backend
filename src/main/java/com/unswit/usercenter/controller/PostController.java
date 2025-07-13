@@ -144,11 +144,8 @@ public class PostController {
     public BaseResponse<PostListResponseVO> listposts(@RequestParam(defaultValue = "1") int page,
                                                       @RequestParam(defaultValue = "5") int size) {
         PostListResponseVO listPosts = postService.getListPosts(page, size);
-        System.out.println(listPosts);
+
         return ResultUtils.success(listPosts);
     }
-
-
-
 
 }

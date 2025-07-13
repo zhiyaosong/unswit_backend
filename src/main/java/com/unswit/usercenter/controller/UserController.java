@@ -1,6 +1,7 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.unswit.usercenter.utils.RedisConstants;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
@@ -120,7 +121,7 @@ public class UserController {
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true);                         // 生产环境强制 HTTPS
         cookie.setPath("/");                             // 整个域名下都带该 Cookie
-        cookie.setMaxAge((int) TimeUnit.MINUTES.toSeconds(30)); // 30 分钟过期
+        cookie.setMaxAge(RedisConstants.LOGIN_USER_TTL.intValue() * 60);
 
         response.addCookie(cookie);
 

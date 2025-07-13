@@ -25,6 +25,7 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/welcome"
                         ).order(1);
         // 优先级最高的拦截器：每次请求刷新token时间，而不仅是登录时才更新token时间
+        // 不放行所有
         registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).order(0);
     }
 }

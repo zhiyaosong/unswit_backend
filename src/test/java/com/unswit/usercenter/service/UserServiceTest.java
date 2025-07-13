@@ -31,7 +31,7 @@ public class UserServiceTest {
 
         user.setEmail("456");
         boolean result = userService.save(user);
-        System.out.println(user.getId());
+
         Assertions.assertTrue(result);
     }
 

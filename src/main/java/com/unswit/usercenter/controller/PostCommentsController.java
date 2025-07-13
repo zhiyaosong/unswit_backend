@@ -5,6 +5,8 @@ import com.unswit.usercenter.dto.post.request.PostCommentRequestVO;
 import com.unswit.usercenter.model.domain.PostComments;
 import com.unswit.usercenter.service.PostCommentsService;
 import com.unswit.usercenter.utils.UserHolder;
+import com.unswit.usercenter.utils.responseUtils.BaseResponse;
+import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,7 +23,7 @@ public class PostCommentsController {
      * @return
      */
     @PostMapping("/add")
-    public Result addComment(@RequestBody PostCommentRequestVO dto) {
+    public BaseResponse<String> addComment(@RequestBody PostCommentRequestVO dto) {
         String id = UserHolder.getUser().getId();
         PostComments comment = new PostComments();
         comment.setContent(dto.getContent());
@@ -29,11 +31,13 @@ public class PostCommentsController {
         comment.setUserId(id);
         comment.setCreateTime(new Date());
         comment.setUpdateTime(new Date());
-        comment.setParentId(dto.getParentId());
+        if (dto.getParentId() != null){
+            comment.setParentId(dto.getParentId());
+        }
         comment.setStatus(0);
 
         postCommentsService.save(comment);
-        return Result.ok();
+        return ResultUtils.success("ok");
     }
 
 

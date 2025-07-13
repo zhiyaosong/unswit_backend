@@ -18,7 +18,7 @@ class UserCenterApplicationTests {
     @Test
     void testDigest() throws NoSuchAlgorithmException {
         String newPassword = DigestUtils.md5DigestAsHex(("abcd" + "mypassword").getBytes());
-        System.out.println(newPassword);
+
     }
 
 
