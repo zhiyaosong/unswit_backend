@@ -3,6 +3,7 @@ package com.unswit.usercenter.service;
 import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
 import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
+import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
 import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -47,5 +48,11 @@ public interface UserService extends IService<User> {
     List<NoteSummaryDTO> getNoteSummary(String userId);
 
     List<PostSummaryDTO> getPostSummary(String userId);
+
+    /** 更新基本信息 */
+    User updateBasicInfo(String userId, UserUpdateInfoRequestVO vo, String token);
+
+    /** 修改密码，内部校验旧密码后更新 */
+    void changePassword(String userId, String oldPwd, String newPwd);
 
 }

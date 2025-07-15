@@ -6,6 +6,8 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.unswit.usercenter.dto.post.PostDetailsDTO;
+import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import com.unswit.usercenter.utils.UserHolder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +74,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(tokenKey);
         // 将 Redis 里的 Map 再转回 UserDTO
-        UserSimpleDTO userSimpleDTO = BeanUtil.mapToBean(userMap, UserSimpleDTO.class, true);
+        UserSimpleDTO userSimpleDTO = BeanUtil.fillBeanWithMap(userMap, new UserSimpleDTO(),false);
 
         // 校验用户是否合法
         String userId = userSimpleDTO.getId();
@@ -278,6 +281,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setAvatarUrl(originUser.getAvatarUrl());
         safetyUser.setGender(originUser.getGender());
         safetyUser.setEmail(originUser.getEmail());
+        safetyUser.setPhoneCN(originUser.getPhoneCN());
+        safetyUser.setPhoneAU(originUser.getPhoneAU());
         safetyUser.setUserRole(originUser.getUserRole());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
@@ -372,5 +377,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return dtoList;
     }
 
+    @Override
+    public User updateBasicInfo(String userId, UserUpdateInfoRequestVO vo, String token) {
+        // 1. 查询用户
+        User user = this.getUserByToken(token);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        // 2. 更新字段
+        BeanUtil.copyProperties(vo, user);
+        // 3. 执行更新
+        boolean ok = this.updateById(user);
+        if (!ok) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        return user;
+    }
 
+    @Override
+    public void changePassword(String userId, String oldPwd, String newPwd) {
+        User user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        // 1. 校验旧密码
+        String encryptOldPwd = DigestUtils.md5DigestAsHex(("unswit" + oldPwd).getBytes());
+        if (!encryptOldPwd.equals(user.getUserPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "旧密码错误");
+        }
+        // 2. 加密并更新
+        String encryptNewPwd = DigestUtils.md5DigestAsHex(("unswit" + newPwd).getBytes());
+        user.setUserPassword(encryptNewPwd);
+        this.updateById(user);
+    }
 }

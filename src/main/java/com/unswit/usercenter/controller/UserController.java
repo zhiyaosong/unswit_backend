@@ -1,6 +1,9 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.unswit.usercenter.dto.user.UserSimpleDTO;
+import com.unswit.usercenter.dto.user.request.ChangePasswordRequestVO;
+import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
 import com.unswit.usercenter.utils.RedisConstants;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
@@ -35,7 +38,7 @@ import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.PUT}, allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -260,4 +263,24 @@ public class UserController {
         return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 
+    /** 更新基本信息 */
+    @PutMapping("/basic")
+    public BaseResponse<User> updateBasic(
+            @RequestBody UserUpdateInfoRequestVO vo,
+            @CookieValue(name = "access_token", required = false) String token
+    ) {
+        String userId = UserHolder.getUser().getId();
+        User updated = userService.updateBasicInfo(userId, vo, token);
+        return ResultUtils.success(updated);
+    }
+
+    /** 修改密码 */
+    @PostMapping("/password")
+    public BaseResponse<String> changePassword(
+            @RequestBody ChangePasswordRequestVO vo
+    ) {
+        UserSimpleDTO user = UserHolder.getUser();
+        userService.changePassword(user.getId(), vo.getOldPassword(), vo.getNewPassword());
+        return ResultUtils.success("ok");
+    }
 }

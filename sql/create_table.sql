@@ -29,7 +29,8 @@ create table if not exists `user`
     userPassword varchar(512)                       not null comment '密码(MD5 Hash)',
     admissionTime varchar(256)                      null comment '入学时间（早于24T1，24T1, 24T2, 24T3, 25T1, 25T2, 25T3, 晚于25T3）',
     email        varchar(512)                       null comment '邮箱',
-    phone        varchar(256)                       null comment '手机号',
+    phoneCN      varchar(256)                       null comment '国内手机号',
+    phoneAU      varchar(256)                       null comment '澳洲手机号',
     signature    TEXT                               null comment '自我描述',
 
     userStatus   tinyint  default 0             not null comment '状态 0 - 正常， 1 - 封号',
@@ -137,7 +138,7 @@ CREATE TABLE if not exists `post_comments`
     userId      char(32)             not null comment 'id,UUID（无中划线32位）' ,
     postId      bigint               NOT NULL COMMENT 'post_id',
     parentId    bigint(20)  UNSIGNED NULL default NULL COMMENT '关联的1级评论id，如果是一级评论，则值为null',
-    content     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
+    content     varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复的内容',
     status      tinyint(1) UNSIGNED  NOT NULL DEFAULT 0 COMMENT '状态，0：正常，1：被举报，2：禁止查看',
     createTime  timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updateTime  timestamp            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

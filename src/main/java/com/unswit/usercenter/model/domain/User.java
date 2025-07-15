@@ -44,5 +44,7 @@ public class User {
 
     private Integer userRole;
 
-    private String phone;
+    private String phoneCN;
+
+    private String phoneAU;
 }

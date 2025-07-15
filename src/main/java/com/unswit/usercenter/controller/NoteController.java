@@ -19,7 +19,6 @@ import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.service.UserNoteLikesService;
 import com.unswit.usercenter.utils.UserHolder;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

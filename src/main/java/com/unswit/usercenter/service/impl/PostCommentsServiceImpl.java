@@ -58,7 +58,7 @@ public class PostCommentsServiceImpl extends ServiceImpl<PostCommentsMapper, Pos
                 new LambdaQueryWrapper<PostComments>()
                         .eq(PostComments::getPostId, postId)
                         .isNull(PostComments::getParentId)
-//                        .orderByDesc(postComments::getCreateTime)
+                        .orderByDesc(PostComments::getCreateTime)
         );
 
         // 3. 查询二级评论
