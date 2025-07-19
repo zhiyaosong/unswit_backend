@@ -26,19 +26,16 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         // String token = request.getHeader("authorization");
         // 获取Cookie中的token
         Cookie[] cookies = request.getCookies();
-        System.out.println("进入refresh拦截器");
 
         if (cookies != null){
             for (Cookie cookie : cookies){
                 if (cookie.getName().equals("access_token")){
                     token = cookie.getValue();
-                    System.out.println("token存在"+token);
                     break;
                 }
             }
         }
         if (StrUtil.isBlank(token)) {
-            System.out.println("token is null, 用户未登录");
             // 放行
             return true;
         }
@@ -47,7 +44,6 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
 
         if(userMap.isEmpty()){
-            System.out.println("userMap is empty");
             // 放行
             return true;
         }

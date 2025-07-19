@@ -1,5 +1,6 @@
 package com.unswit.usercenter.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -15,6 +16,8 @@ import java.util.Date;
 public class Note {
     @TableId
     private Long id;
+    // 防止自动映射到user_id
+    @TableField(value = "userId")
     private String userId;
     // NoteRequestDTO中的字段:
     private String title;

@@ -28,4 +28,15 @@
         toolTip,noteStatus,isChecked,createTime,updateTime,
         isDelete,userId,isOfficial,likeCount
     </sql>
+    <select id="selectNoteSummaries" resultType="com.unswit.usercenter.dto.note.NoteSummaryDTO">
+        SELECT
+            id,
+            title,
+            toolTip,
+            updateTime AS updatedAt
+        FROM note
+        WHERE userId = #{userId}
+          AND isDelete = 0
+        ORDER BY updateTime DESC
+    </select>
 </mapper>

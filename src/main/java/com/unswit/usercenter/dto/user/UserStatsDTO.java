@@ -3,7 +3,7 @@ package com.unswit.usercenter.dto.user;
 import lombok.Data;
 
 @Data
-public class AccountCenterSummaryDTO {
+public class UserStatsDTO {
     /**
      * 笔记数
      */
@@ -13,7 +13,11 @@ public class AccountCenterSummaryDTO {
      */
     private Long postCount;
     /**
-     * 点赞量
+     * 笔记点赞量
      */
-    private Long likeCount;
+    private Long noteLikeCount;
+    /**
+     * 帖子点赞量
+     */
+    private Long postLikeCount;
 }

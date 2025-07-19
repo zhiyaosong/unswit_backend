@@ -1,6 +1,7 @@
 package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.dto.user.request.ChangePasswordRequestVO;
 import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
@@ -9,7 +10,8 @@ import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
 import com.unswit.usercenter.dto.Result;
-import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.PagedResult;
+import com.unswit.usercenter.dto.user.UserStatsDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.model.domain.User;
@@ -25,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.unswit.usercenter.contant.UserConstant.ADMIN_ROLE;
@@ -115,8 +115,8 @@ public class UserController {
         }
 
         String token = userService.userLogin(userAccount, userPassword);
-        if (Objects.equals(token, "用户为空") || Objects.equals(token, "账户不符合要求") || token == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        if (token == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
 
         // 2. 把 token 写进 HttpOnly Cookie
@@ -214,13 +214,13 @@ public class UserController {
      * @param
      * @return
      */
-    @GetMapping("account/center/summary")
+    @GetMapping("/stats")
     public Result getUserSummary() {
         String userId = UserHolder.getUser().getId();
         if(userId==null){
             return Result.fail("用户未登陆！");
         }
-        AccountCenterSummaryDTO summary = userService.getAccountCenterSummary(userId);
+        UserStatsDTO summary = userService.getUserStats(userId);
         return Result.ok(summary);
     }
 
@@ -228,15 +228,20 @@ public class UserController {
      * 笔记卡片列表
      * @return
      */
-    @GetMapping("account/center/note")
-    public Result getMyNote() {
+    @GetMapping("/notes")
+    public BaseResponse<PagedResult<NoteSummaryDTO>> getMyNotes(
+            @RequestParam(value = "current", defaultValue = "1") long current,
+            @RequestParam(value = "pageSize", defaultValue = "10") long pageSize) {
         String userId = UserHolder.getUser().getId();
-        if (userId==null) {
-            return Result.fail("用户未登陆");
+        if (userId == null) {
+            return ResultUtils.error(ErrorCode.NOT_LOGIN, "用户未登录");
         }
-        List<NoteSummaryDTO> noteSummary = userService.getNoteSummary(userId);
-
-        return Result.ok(noteSummary);
+        // 调用 Service 获取 MyBatis-Plus 分页对象
+        IPage<NoteSummaryDTO> page = userService.getMyNotes(userId, current, pageSize);
+        PagedResult<NoteSummaryDTO> result = new PagedResult<>();
+        result.setData(page.getRecords());
+        result.setTotal(page.getTotal());
+        return ResultUtils.success(result);
     }
 
     @GetMapping("account/center/post")

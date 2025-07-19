@@ -3,6 +3,7 @@ package com.unswit.usercenter.service.impl;
 import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.dto.post.response.PostListResponseVO;
@@ -72,36 +73,85 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
     }
 
+    private static final Map<String, SFunction<Post, ?>> SORT_COLUMN_MAP = new HashMap<>();
+    static {
+        SORT_COLUMN_MAP.put("createTime", Post::getCreateTime);
+        SORT_COLUMN_MAP.put("likeCount", Post::getLikeCount);
+        SORT_COLUMN_MAP.put("commentCount", Post::getCommentCount);
+//        SORT_COLUMN_MAP.put("viewCount", Post::getViewCount);
+    }
+
     @Override
-    public PostListResponseVO getListPosts(int page, int size) {
-        // 1. 分页查询 post 对象
-        Page<Post> postPage = this.page(
-                new Page<>(page, size),
-                new LambdaQueryWrapper<Post>()
-                        .orderByDesc(Post::getCreateTime)
-        );
+    public PostListResponseVO getListPosts(int page, int size, String sortBy, String sortOrder) {
+        // 安全处理分页参数
+        page = Math.max(page, 1);
+        size = Math.min(Math.max(size, 1), 100); // 防滥用
+        // 归一化排序
+        String finalSortOrder = normalizeSortOrder(sortOrder);
+
+        // 默认排序字段
+        if (sortBy == null || !SORT_COLUMN_MAP.containsKey(sortBy)) {
+            sortBy = "createTime"; // 默认按创建时间
+        }
+
+        // 取出对应列的引用
+        SFunction<Post, ?> column = (SFunction<Post, ?>) SORT_COLUMN_MAP.get(sortBy);
+
+        // 构造分页对象
+        Page<Post> mpPage = new Page<>(page, size);
+
+        // 构造 Wrapper
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<>();
+
+        // 根据方向添加排序
+        if ("asc".equals(finalSortOrder)) {
+            wrapper.orderByAsc(column);
+        } else {
+            wrapper.orderByDesc(column);
+        }
+
+        Page<Post> postPage = this.page(mpPage, wrapper);
         List<Post> posts = postPage.getRecords();
 
-        // 2. 转换为 DTO 列表
-        List<PostSummaryDTO> listposts = posts.stream().map(post -> {
-            String userId = post.getUserId();
-            String userName = Optional.ofNullable(
-                            userMapper.selectOne(
-                                    new QueryWrapper<User>()
-                                            .eq("id", userId)
-                                            .select("userName")
-                            )
-                    ).map(User::getUserName)
-                    .orElse("匿名用户");
+        // ===== 批量查用户，避免 N+1 =====
+        Set<String> userIds = posts.stream()
+                .map(Post::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-            return getpostSummaryDTO(post, userName);
-        }).collect(Collectors.toList());
+        Map<String, User> userMap;
+        if (!userIds.isEmpty()) {
+            List<User> users = userMapper.selectList(
+                    new QueryWrapper<User>()
+                            .in("id", userIds)
+                            .select("id", "userName", "avatarUrl")
+            );
+            userMap = users.stream().collect(Collectors.toMap(User::getId, u -> u));
+        } else {
+            userMap = new HashMap<>();
+        }
+
+        List<PostSummaryDTO> listposts = posts.stream()
+                .map(post -> {
+                    User u = userMap.get(post.getUserId());
+                    String userName = (u != null && u.getUserName() != null) ? u.getUserName() : "编程侠";
+                    String avatar = (u != null && u.getAvatarUrl() != null) ? u.getAvatarUrl() : "/img/a.png";
+                    return getpostSummaryDTO(post, userName, avatar);
+                })
+                .collect(Collectors.toList());
+
 
         // 3. 封装返回
         PostListResponseVO response = new PostListResponseVO();
         response.setPostSumList(listposts);
         response.setTotal((int) postPage.getTotal());
         return response;
+    }
+
+    private String normalizeSortOrder(String sortOrder) {
+        if (sortOrder == null) return "desc";
+        sortOrder = sortOrder.trim().toLowerCase();
+        return ("asc".equals(sortOrder) ? "asc" : "desc"); // 默认 desc
     }
 
     /** 获取每个笔记的总点赞数 */
@@ -144,11 +194,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                 ));
     }
 
-    private static PostSummaryDTO getpostSummaryDTO(Post post, String userName) {
+    private static PostSummaryDTO getpostSummaryDTO(Post post, String userName, String userAvatar) {
         PostSummaryDTO dto = new PostSummaryDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         dto.setAuthor(userName);
+        dto.setAuthorAvatar(userAvatar);
         dto.setLikeCount(post.getLikeCount());
         dto.setCommentCount(post.getCommentCount());
         dto.setUpdateTime(post.getUpdateTime());

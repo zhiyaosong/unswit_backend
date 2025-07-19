@@ -49,13 +49,13 @@ public class NoteController {
      * @return
      */
     @PostMapping("add")
-    public BaseResponse<Map<String, CategoryCourseDTO>> addNote(@RequestBody AddNoteRequestVO req) {
+    public BaseResponse<String> addNote(@RequestBody AddNoteRequestVO req) {
         NoteRequestVO note = req.getNote();
 
         String userId = req.getUserId();
 
-        Map<String, CategoryCourseDTO> notes = noteService.addNote(note, userId);
-        return ResultUtils.success(notes);
+        String courseCode = noteService.addNote(note, userId);
+        return ResultUtils.success(1,"ok","笔记加入"+courseCode+"成功");
     }
 
     @GetMapping("audit/{id}")

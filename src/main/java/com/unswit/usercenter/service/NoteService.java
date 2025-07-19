@@ -16,7 +16,7 @@ import java.util.Map;
 */
 public interface NoteService extends IService<Note> {
 
-    Map<String, CategoryCourseDTO> addNote(NoteRequestVO note, String userId);
+    String addNote(NoteRequestVO note, String userId);
 
 //    List<Note> getAllNotes(User user);
 

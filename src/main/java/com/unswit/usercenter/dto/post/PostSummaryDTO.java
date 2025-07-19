@@ -9,6 +9,8 @@ public class PostSummaryDTO {
      * 发布blog的用户名
      */
     private String author;
+
+    private String authorAvatar;
     /**
      * post id
      */

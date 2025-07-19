@@ -57,12 +57,11 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
 
 
     @Override
-    public Map<String, CategoryCourseDTO> addNote(NoteRequestVO noteDTO, String userId) {
+    public String addNote(NoteRequestVO noteDTO, String userId) {
 
         if (noteDTO == null) {
-            // 这里你可以选择抛异常，也可以返回一个空列表
             System.out.println("note为空");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 设置note.
         //   title; // 笔记名称
@@ -119,7 +118,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
             userMapper.updateById(user);
             System.out.println("更改为会员");
         }
-        return courseService.getAllCourseNote(userId);
+        return noteDTO.getCode();
     }
 
     @Transactional

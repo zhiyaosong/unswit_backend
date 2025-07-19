@@ -16,7 +16,7 @@ public interface PostService extends IService<Post> {
 
     Long likePost(Long id);
 
-    PostListResponseVO getListPosts(int page, int size);
+    PostListResponseVO getListPosts(int page, int size, String sortBy, String sortOrder);
 
     Map<Long, Integer> getLikeCounts(List<Long> postIds);
 

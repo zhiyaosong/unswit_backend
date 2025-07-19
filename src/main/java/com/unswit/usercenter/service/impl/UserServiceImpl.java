@@ -5,12 +5,13 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.unswit.usercenter.dto.post.PostDetailsDTO;
 import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
-import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.unswit.usercenter.dto.user.UserStatsDTO;
 import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.exception.BusinessException;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import com.unswit.usercenter.utils.UserHolder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -185,21 +185,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String validPattern = "^[a-zA-Z0-9_]+$";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (!matcher.matches()) {
-            return "账户不符合要求";
+//            return "账户不符合要求";
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账户不符合要求(只能由字母、数字和下划线组成)");
         }
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-        System.out.println("加密后密码"+encryptPassword);
         // 查询用户是否存在
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userAccount", userAccount);
         queryWrapper.eq("userPassword", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
+        System.out.println(user);
 
         if (user == null) {
             // 前端弹窗内容是desc内容
-            System.out.println("用户为空");
-            return "用户为空";
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+//            return "用户为空";
         }
         //保存用户到Redis
         //1.生成token，生成登陆令牌
@@ -226,7 +227,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             stringRedisTemplate.opsForHash().putAll( tokenKey,userMap);
             stringRedisTemplate.expire(tokenKey,LOGIN_USER_TTL, TimeUnit.MINUTES);
         } catch(ClassCastException cce){
-            // 如果这里还报错，再次打印 Map 结构，以便尽快发现问题
             System.err.println(">> [ERROR] Redis putAll 导致 ClassCastException，map 内容如下：");
             throw cce;
         }
@@ -243,13 +243,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 查出被「踢下线」的多余 token（范围：从第 MAX_SESSIONS 个到末尾）
         List<String> expiredTokens =
                 stringRedisTemplate.opsForList().range(userSessionsKey, MAX_SESSIONS, -1);
-        System.out.println("expiredTokens:" + expiredTokens);
 
         if (expiredTokens != null && !expiredTokens.isEmpty()) {
             for (String oldToken : expiredTokens) {
                 // 1) 删除旧的会话数据
                 String oldTokenKey = LOGIN_USER_KEY + oldToken;
-                System.out.println("已删除oldTokenKey:" + oldTokenKey);
                 stringRedisTemplate.delete(oldTokenKey);
                 // 2) 从列表中移除（防止 trim 后保留）
                 stringRedisTemplate.opsForList().remove(userSessionsKey, 0, oldToken);
@@ -305,52 +303,63 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public AccountCenterSummaryDTO getAccountCenterSummary(String userId) {
+    public UserStatsDTO getUserStats(String userId) {
+        // TODO：后续改为静态存储，建立user_stats_count表
+        // 发帖数
         QueryWrapper<Post> wrapper = new QueryWrapper<>();
         wrapper.eq("userId", userId)
                 .eq("isDelete",0);
         Long postCount = postMapper.selectCount(wrapper);
-
+        // 笔记数
         QueryWrapper<Note> noteQueryWrapper = new QueryWrapper<>();
         noteQueryWrapper.eq("userId", userId)
                 .eq("isDelete",0);
         Long noteCount = noteMapper.selectCount(noteQueryWrapper);
-
+        // 笔记点赞数
         QueryWrapper<Note> noteQueryWrapper2 = new QueryWrapper<>();
         noteQueryWrapper2.select("SUM(likeCount) AS totalLikes")
                 .eq("userId", userId)
                 .eq("isDelete", 0);
+        // 帖子点赞数
+        QueryWrapper<Post> postQueryWrapper2 = new QueryWrapper<>();
+        postQueryWrapper2.select("SUM(likeCount) AS totalLikes")
+                .eq("userId", userId)
+                .eq("isDelete", 0);
 
-        Map<String, Object> result = noteMapper.selectMaps(noteQueryWrapper2).get(0);
-        Long totalLikes = result.get("totalLikes") != null ? ((Number) result.get("totalLikes")).longValue(): 0;
+        UserStatsDTO dto = new UserStatsDTO();
 
-        AccountCenterSummaryDTO dto = new AccountCenterSummaryDTO();
+        List<Map<String, Object>> noteResultList = noteMapper.selectMaps(noteQueryWrapper2);
+        if (noteResultList == null || noteResultList.isEmpty() || noteResultList.get(0) == null) {
+            // 没有数据，直接返回 0
+            dto.setNoteLikeCount(0L);
+        }else{
+            Map<String, Object> result = noteResultList.get(0);
+            Object raw = result.get("totalLikes");
+            long totalLikes = raw != null ? ((Number) raw).longValue() : 0L;
+            dto.setNoteLikeCount(totalLikes);
+        }
+
+        List<Map<String, Object>> postResultList = postMapper.selectMaps(postQueryWrapper2);
+        if (postResultList == null || postResultList.isEmpty() || postResultList.get(0) == null) {
+            // 没有数据，直接返回 0
+            dto.setPostLikeCount(0L);
+        }else{
+            Map<String, Object> result = postResultList.get(0);
+            Object raw = result.get("totalLikes");
+            long totalLikes = raw != null ? ((Number) raw).longValue() : 0L;
+            dto.setPostLikeCount(totalLikes);
+        }
+
         dto.setPostCount(postCount);
         dto.setNoteCount(noteCount);
-        dto.setLikeCount(totalLikes);
 
         return dto;
     }
 
-    @Override
-    public List<NoteSummaryDTO> getNoteSummary(String userId) {
-        List<Note> notes = noteMapper.selectList(
-                new QueryWrapper<Note>()
-                        .eq("userId", userId)
-                        .eq("isDelete", 0)
-                        .eq("noteStatus", 0)
-                        .orderByDesc("updateTime")
-        );
-        List<NoteSummaryDTO> dtoList = notes.stream().map(note -> {
-            NoteSummaryDTO dto = new NoteSummaryDTO();
-            dto.setId(note.getId());
-            dto.setTitle(note.getTitle());
-            dto.setUpdateTime(note.getUpdateTime());
-            dto.setToolTip(note.getToolTip());
-            return dto;
-        }).collect(Collectors.toList());
-
-        return dtoList;
+    public IPage<NoteSummaryDTO> getMyNotes(String userId, long current, long pageSize) {
+        Page<NoteSummaryDTO> page = new Page<>(current, pageSize);
+        // 自定义 mapper 方法：返回转换后的 DTO 列表
+        return noteMapper.selectNoteSummaries(page, userId);
     }
 
 

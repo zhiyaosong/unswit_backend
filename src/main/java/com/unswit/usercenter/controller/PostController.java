@@ -41,7 +41,7 @@ public class PostController {
      * @return
      */
     @PostMapping("/add")
-    public BaseResponse<Long> savepost(@RequestBody Post post) {
+    public BaseResponse<Long> savePost(@RequestBody Post post) {
         // 获取登录用户
         UserSimpleDTO user = UserHolder.getUser();
         post.setUserId(user.getId());
@@ -57,7 +57,7 @@ public class PostController {
      * @return
      */
     @GetMapping("/of/me")
-    public BaseResponse<List<Post>> queryMypost(@RequestParam(value = "current", defaultValue = "1") Integer current) {
+    public BaseResponse<List<Post>> queryMyPost(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         // 获取登录用户
         UserSimpleDTO user = UserHolder.getUser();
         // 根据用户查询
@@ -75,7 +75,7 @@ public class PostController {
      * @return
      */
     @PutMapping("/like/{id}")
-    public BaseResponse likePost(@PathVariable("id") Long id) {
+    public BaseResponse<Long> likePost(@PathVariable("id") Long id) {
         Long postId = postService.likePost(id);
         return ResultUtils.success(postId);
     }
@@ -142,8 +142,10 @@ public class PostController {
      */
     @GetMapping({ "", "/" })
     public BaseResponse<PostListResponseVO> listposts(@RequestParam(defaultValue = "1") int page,
-                                                      @RequestParam(defaultValue = "5") int size) {
-        PostListResponseVO listPosts = postService.getListPosts(page, size);
+                                                      @RequestParam(defaultValue = "5") int size,
+                                                      @RequestParam(required = false) String sortBy,
+                                                      @RequestParam(required = false) String sortOrder) {
+        PostListResponseVO listPosts = postService.getListPosts(page, size, sortBy, sortOrder);
 
         return ResultUtils.success(listPosts);
     }

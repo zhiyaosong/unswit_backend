@@ -9,7 +9,14 @@ public class ResultUtils {
      * 成功
      */
     public static <T> BaseResponse<T> success(T data) {
-        return new BaseResponse<>(0, data, "ok");
+        return new BaseResponse<>(0, data, "");
+    }
+
+    /**
+     * 成功
+     */
+    public static <T> BaseResponse<T> success(int code, T data, String description) {
+        return new BaseResponse<>(code, data, description);
     }
 
     /**

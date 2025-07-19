@@ -120,9 +120,9 @@ create table if not exists `post`
     title        varchar(255)  character set utf8mb4 collate utf8mb4_unicode_ci not null comment '标题',
     images       varchar(2048) character set utf8mb4 collate utf8mb4_general_ci  comment '帖子照片，最多9张，多张以","隔开',
     content      varchar(2048) character set utf8mb4 collate utf8mb4_unicode_ci not null comment '帖子内容',
-    likeCount    int(8) unsigned null default 0 comment '点赞数量',
-    commentCount int(8) unsigned null default null comment '评论数量',
-    status       tinyint(1) UNSIGNED NULL DEFAULT NULL COMMENT '状态，0：正常，1：被举报，2：禁止查看',
+    likeCount    int(8) unsigned not null default 0 comment '点赞数量',
+    commentCount int(8) unsigned not null default 0 comment '评论数量',
+    status       tinyint(1) UNSIGNED not NULL DEFAULT 0 COMMENT '状态，0：正常，1：被举报，2：禁止查看',
 
     createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
     updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,

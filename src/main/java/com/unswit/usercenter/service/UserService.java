@@ -1,6 +1,7 @@
 package com.unswit.usercenter.service;
 
-import com.unswit.usercenter.dto.user.AccountCenterSummaryDTO;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.unswit.usercenter.dto.user.UserStatsDTO;
 import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
 import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
@@ -43,9 +44,16 @@ public interface UserService extends IService<User> {
     int userLogout(HttpServletRequest request, String token);
 
 
-    AccountCenterSummaryDTO getAccountCenterSummary(String userId);
+    UserStatsDTO getUserStats(String userId);
 
-    List<NoteSummaryDTO> getNoteSummary(String userId);
+    /**
+     * 分页获取某用户的 NoteSummaryDTO 列表
+     * @param userId 用户 ID
+     * @param current 页码
+     * @param pageSize 每页条数
+     * @return 包含 records 和 total 的 IPage 对象
+     */
+    IPage<NoteSummaryDTO> getMyNotes(String userId, long current, long pageSize);
 
     List<PostSummaryDTO> getPostSummary(String userId);
 
