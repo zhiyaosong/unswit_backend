@@ -364,26 +364,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public List<PostSummaryDTO> getPostSummary(String userId) {
-        List<Post> posts = postMapper.selectList(
-                new QueryWrapper<Post>()
-                        .eq("userId", userId)
-                        .eq("isDelete", 0)
-                        .eq("status", 0)
-                        .orderByDesc("updateTime")
-        );
-        List<PostSummaryDTO> dtoList = posts.stream().map(post -> {
-            PostSummaryDTO dto = new PostSummaryDTO();
-            dto.setTitle(post.getTitle());
-            dto.setUpdateTime(post.getUpdateTime());
-            dto.setId(post.getId());
-            String content = post.getContent();
-            dto.setContent(content.length()>50?content.substring(0,50)+"...":content);
-
-            return dto;
-        }).collect(Collectors.toList());
-
-        return dtoList;
+    public IPage<PostSummaryDTO> getMyPost(String userId, long current, long pageSize) {
+        Page<PostSummaryDTO> page = new Page<>(current, pageSize);
+        // 自定义 mapper 方法：返回转换后的 DTO 列表
+        return postMapper.selectPostSummaries(page, userId);
     }
 
     @Override

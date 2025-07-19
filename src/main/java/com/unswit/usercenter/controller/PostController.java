@@ -26,6 +26,7 @@ import java.util.Map;
 
 @Tag(name = "Post接口", description = "Post增删改查接口")
 @RestController
+@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
 @RequestMapping("/posts")
 public class PostController {
     @Resource
@@ -137,17 +138,35 @@ public class PostController {
      * 只返回post
      * 将代码逻辑写在service里面
      * @param page
-     * @param size
+     * @param pageSize
      * @return
      */
     @GetMapping({ "", "/" })
     public BaseResponse<PostListResponseVO> listposts(@RequestParam(defaultValue = "1") int page,
-                                                      @RequestParam(defaultValue = "5") int size,
+                                                      @RequestParam(defaultValue = "5") int pageSize,
                                                       @RequestParam(required = false) String sortBy,
                                                       @RequestParam(required = false) String sortOrder) {
-        PostListResponseVO listPosts = postService.getListPosts(page, size, sortBy, sortOrder);
+        PostListResponseVO listPosts = postService.getListPosts(page, pageSize, sortBy, sortOrder);
 
         return ResultUtils.success(listPosts);
+    }
+
+    /**
+     * 删除帖子
+     * DELETE /api/user/posts/{id}
+     */
+    @DeleteMapping("/{id}")
+    public BaseResponse<String> deletePost(
+            @PathVariable("id") Long postId
+    ) {
+        // 从 Authentication 中取出当前用户 ID
+        String userId = UserHolder.getUser().getId();
+        int deletedCount = postService.deletePost(postId, userId);
+        if (deletedCount > 0) {
+            return ResultUtils.success("删除成功");
+        } else {
+            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+        }
     }
 
 }

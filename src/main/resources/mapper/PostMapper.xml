@@ -22,4 +22,17 @@
         id,userId,title,images,content,likeCount,
         commentCount,status,createTime,updateTime,isDelete
     </sql>
+    <select id="selectPostSummaries" resultType="com.unswit.usercenter.dto.post.PostSummaryDTO">
+        SELECT
+            id,
+            title,
+            content,
+            likeCount,
+            commentCount,
+            updateTime
+        FROM post
+        WHERE userId = #{userId}
+          AND isDelete = 0
+        ORDER BY updateTime DESC
+    </select>
 </mapper>

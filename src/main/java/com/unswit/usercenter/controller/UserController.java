@@ -2,6 +2,7 @@ package com.unswit.usercenter.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.dto.user.request.ChangePasswordRequestVO;
 import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
@@ -9,7 +10,6 @@ import com.unswit.usercenter.utils.RedisConstants;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.utils.responseUtils.ResultUtils;
-import com.unswit.usercenter.dto.Result;
 import com.unswit.usercenter.dto.PagedResult;
 import com.unswit.usercenter.dto.user.UserStatsDTO;
 import com.unswit.usercenter.dto.note.NoteSummaryDTO;
@@ -215,13 +215,13 @@ public class UserController {
      * @return
      */
     @GetMapping("/stats")
-    public Result getUserSummary() {
+    public BaseResponse<UserStatsDTO> getUserSummary() {
         String userId = UserHolder.getUser().getId();
         if(userId==null){
-            return Result.fail("用户未登陆！");
+            return ResultUtils.error(ErrorCode.NOT_LOGIN);
         }
         UserStatsDTO summary = userService.getUserStats(userId);
-        return Result.ok(summary);
+        return ResultUtils.success(summary);
     }
 
     /**
@@ -234,7 +234,7 @@ public class UserController {
             @RequestParam(value = "pageSize", defaultValue = "10") long pageSize) {
         String userId = UserHolder.getUser().getId();
         if (userId == null) {
-            return ResultUtils.error(ErrorCode.NOT_LOGIN, "用户未登录");
+            return ResultUtils.error(ErrorCode.NOT_LOGIN);
         }
         // 调用 Service 获取 MyBatis-Plus 分页对象
         IPage<NoteSummaryDTO> page = userService.getMyNotes(userId, current, pageSize);
@@ -244,14 +244,19 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-    @GetMapping("account/center/post")
-    public Result getMyPost() {
+    @GetMapping("/posts")
+    public BaseResponse<PagedResult<PostSummaryDTO>> getMyPost(
+            @RequestParam(value = "current", defaultValue = "1") long current,
+            @RequestParam(value = "pageSize", defaultValue = "10") long pageSize) {
         String userId = UserHolder.getUser().getId();
         if (userId==null) {
-            return Result.fail("用户未登陆");
+            return ResultUtils.error(ErrorCode.NOT_LOGIN);
         }
-        userService.getPostSummary(userId);
-        return Result.ok();
+        IPage<PostSummaryDTO> page = userService.getMyPost(userId, current, pageSize );
+        PagedResult<PostSummaryDTO> result = new PagedResult<>();
+        result.setData(page.getRecords());
+        result.setTotal(page.getTotal());
+        return ResultUtils.success(result);
     }
 
 

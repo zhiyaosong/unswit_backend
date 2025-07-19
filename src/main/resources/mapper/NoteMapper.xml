@@ -33,7 +33,7 @@
             id,
             title,
             toolTip,
-            updateTime AS updatedAt
+            updateTime
         FROM note
         WHERE userId = #{userId}
           AND isDelete = 0

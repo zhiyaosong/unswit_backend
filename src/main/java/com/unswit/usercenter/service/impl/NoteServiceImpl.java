@@ -3,6 +3,7 @@ package com.unswit.usercenter.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.unswit.usercenter.model.domain.*;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import com.unswit.usercenter.dto.note.CategoryCourseDTO;
 import com.unswit.usercenter.dto.note.request.NoteRequestVO;
@@ -10,10 +11,6 @@ import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.CourseMapper;
 import com.unswit.usercenter.mapper.UserMapper;
 import com.unswit.usercenter.mapper.UserNoteLikesMapper;
-import com.unswit.usercenter.model.domain.Course;
-import com.unswit.usercenter.model.domain.Note;
-import com.unswit.usercenter.model.domain.User;
-import com.unswit.usercenter.model.domain.UserNoteLikes;
 import com.unswit.usercenter.service.CourseService;
 import com.unswit.usercenter.service.NoteService;
 import com.unswit.usercenter.mapper.NoteMapper;
@@ -24,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -187,6 +185,28 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
                         Function.identity(),
                         likedSet::contains
                 ));
+    }
+
+    @Override
+    public int deleteNote(Long noteId, String userId) {
+        // 1. 校验帖子是否存在
+        Note note = this.getById(noteId);
+        if (note == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+
+        // 2. 校验当前用户是否为帖子作者
+        if (!note.getUserId().equals(userId)){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+
+        System.out.println(userId);
+        System.out.println(noteId);
+
+        // 3. 执行删除
+        boolean removed = this.removeById(noteId);
+
+        return removed ? 1 : 0;
     }
 }
 

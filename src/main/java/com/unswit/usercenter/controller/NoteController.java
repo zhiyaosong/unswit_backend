@@ -28,7 +28,7 @@ import java.util.Map;
 @Tag(name = "note接口", description = "notes增删改接口（查在course接口里）")
 @RestController
 @RequestMapping("/note")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
 public class NoteController {
     @Resource
     private NoteService noteService;
@@ -66,15 +66,6 @@ public class NoteController {
         } else {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
-    }
-    @DeleteMapping("delete/{id}")
-    public  Map<String, CategoryCourseDTO> deleteNote(@PathVariable long id) {
-        String userId = UserHolder.getUser().getId();
-        int rows = noteMapper.deleteById(id);
-        if (rows == 0) {
-            throw new BusinessException(ErrorCode.NULL_ERROR);
-        }
-        return courseService.getAllCourseNote(userId);
     }
 
     /**
@@ -143,6 +134,39 @@ public class NoteController {
     ) {
         ToggleLikeNoteResponseVO resp = userNoteLikesService.toggleLike(req);
         return ResultUtils.success(resp);
+    }
+
+    /**
+     * 删除笔记
+     * DELETE /api/note/{id}
+     */
+    // 第一种删除方法：service.removeById(id)（底层调用的还是baseMapper.deleteById(id)）:返回Boolean: true(成功删除行数>0)
+    // 重点在这里：
+    // 如果你在 ServiceImpl 或整个 Service 层做了事务、AOP 切面、权限校验、缓存清理等扩展逻辑，
+    // 调用 removeById 能更好地打通这些链路——
+    // 而直接调用 baseMapper.deleteById，
+    // 则只执行了最底层的删数 SQL。
+    @DeleteMapping("{id}")
+    public BaseResponse<String> deletePost(
+            @PathVariable("id") Long noteId
+    ) {
+        System.out.println("进入删除note controller");
+        String userId = UserHolder.getUser().getId();
+        int deletedCount = noteService.deleteNote(noteId, userId);
+        if (deletedCount > 0) {
+            return ResultUtils.success("删除成功");
+        } else {
+            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+        }
+    }
+    // 第二种删除方法：baseMapper.deleteById(id), 返回逻辑删除的行数
+    @DeleteMapping("delete/{id}")
+    public  BaseResponse<String> deleteNote(@PathVariable long id) {
+        int rows = noteMapper.deleteById(id);
+        if (rows == 0) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return ResultUtils.success("删除成功");
     }
 }
 

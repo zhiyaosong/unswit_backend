@@ -21,4 +21,12 @@ public interface PostService extends IService<Post> {
     Map<Long, Integer> getLikeCounts(List<Long> postIds);
 
     Map<Long, Boolean> getUserLikedStatus(String userId, List<Long> postIds);
+
+    /**
+     * 删除指定用户的帖子
+     * @param postId 帖子 ID
+     * @param userId 当前登录用户 ID
+     * @return 被删除的记录数（0 表示删除失败或无权限）
+     */
+    int deletePost(Long postId, String userId);
 }

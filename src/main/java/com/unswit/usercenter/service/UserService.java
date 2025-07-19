@@ -9,7 +9,6 @@ import com.unswit.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 用户服务
@@ -55,7 +54,7 @@ public interface UserService extends IService<User> {
      */
     IPage<NoteSummaryDTO> getMyNotes(String userId, long current, long pageSize);
 
-    List<PostSummaryDTO> getPostSummary(String userId);
+    IPage<PostSummaryDTO> getMyPost(String userId, long current, long pageSize);
 
     /** 更新基本信息 */
     User updateBasicInfo(String userId, UserUpdateInfoRequestVO vo, String token);

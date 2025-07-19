@@ -26,4 +26,5 @@ public class NoteSummaryDTO {
      */
     private Date updateTime;
 
+    private Integer likeCount;
 }

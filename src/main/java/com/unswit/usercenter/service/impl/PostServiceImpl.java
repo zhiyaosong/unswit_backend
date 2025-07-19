@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.unswit.usercenter.dto.post.response.PostListResponseVO;
 import com.unswit.usercenter.dto.post.PostSummaryDTO;
+import com.unswit.usercenter.exception.BusinessException;
 import com.unswit.usercenter.mapper.UserPostLikesMapper;
 import com.unswit.usercenter.mapper.UserMapper;
 
@@ -17,6 +18,7 @@ import com.unswit.usercenter.model.domain.UserPostLikes;
 import com.unswit.usercenter.service.PostService;
 import com.unswit.usercenter.mapper.PostMapper;
 import com.unswit.usercenter.utils.UserHolder;
+import com.unswit.usercenter.utils.responseUtils.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -166,6 +168,25 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                         Post::getLikeCount,
                         (a, b) -> a  // 不会重复
                 ));
+    }
+
+    @Override
+    public int deletePost(Long postId, String userId) {
+        // 1. 校验帖子是否存在
+        Post post = this.getById(postId);
+        if (post == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+
+        // 2. 校验当前用户是否为帖子作者
+        if (!post.getUserId().equals(userId)){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        System.out.println("postId:"+postId);
+        // 3. 执行删除
+        boolean removed = this.removeById(postId);
+
+        return removed ? 1 : 0;
     }
 
     /** 查询 user_post_likes 表，看哪些记录存在 */
