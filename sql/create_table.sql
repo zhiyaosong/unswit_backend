@@ -129,6 +129,8 @@ create table if not exists `post`
     isDelete     tinyint  default 0                 not null comment '是否删除',
     FOREIGN KEY (userId) REFERENCES user(id)
 )comment '帖子';
+ALTER TABLE `post`
+    ADD INDEX `idx_post_create_time` (`createTime`);
 
 
 # post comments
