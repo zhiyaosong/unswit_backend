@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Tag(name = "Post接口", description = "Post增删改查接口")
 @RestController
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","https://unswit.com"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
 @RequestMapping("/posts")
 public class PostController {
     @Resource

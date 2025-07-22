@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:8000","https://unswit.com"},methods = {RequestMethod.POST,RequestMethod.GET, RequestMethod.DELETE}, allowCredentials = "true")
 @RequestMapping("/comments")
 public class PostCommentsController {
     @Resource
