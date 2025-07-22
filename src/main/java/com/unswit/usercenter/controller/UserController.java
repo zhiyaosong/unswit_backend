@@ -6,6 +6,7 @@ import com.unswit.usercenter.dto.post.PostSummaryDTO;
 import com.unswit.usercenter.dto.user.UserSimpleDTO;
 import com.unswit.usercenter.dto.user.request.ChangePasswordRequestVO;
 import com.unswit.usercenter.dto.user.request.UserUpdateInfoRequestVO;
+import com.unswit.usercenter.service.BlacklistService;
 import com.unswit.usercenter.utils.RedisConstants;
 import com.unswit.usercenter.utils.responseUtils.BaseResponse;
 import com.unswit.usercenter.utils.responseUtils.ErrorCode;
@@ -43,6 +44,8 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private BlacklistService blacklistService;
 
     @GetMapping("/list")
     public BaseResponse<List<User>> getUserList(HttpServletRequest request) {
@@ -101,7 +104,7 @@ public class UserController {
     @PostMapping("/login")
     public BaseResponse<String> userLogin(
             @RequestBody UserLoginRequestVO userLoginRequestVO,
-            HttpServletResponse response) {
+            HttpServletResponse response,HttpServletRequest request) {
         //实现登陆功能
         //1.判空 返回错误
         if (userLoginRequestVO == null) {
@@ -127,9 +130,34 @@ public class UserController {
         cookie.setMaxAge(RedisConstants.LOGIN_USER_TTL.intValue() * 60);
 
         response.addCookie(cookie);
-
+        // 1. 拿userid
+        String userId = UserHolder.getUser().getId();
+        System.out.println("userId"+userId);
+        // 2. 提取客户端 IP
+        String ip = extractClientIp(request);
+        // 3. 记录登录并自动触发可能的拉黑
+        blacklistService.recordLogin(userId, ip);
         return ResultUtils.success("ok");
     }
+    private String extractClientIp(HttpServletRequest req) {
+        // 1. 尝试从 “X-Forwarded-For” 请求头中读取
+        String xf = req.getHeader("X-Forwarded-For");
+
+        // 2. 如果该头存在且不为空，则该值通常是一个以逗号分隔的 IP 列表：
+        //    客户端 IP, 第一级代理 IP, 第二级代理 IP, …
+        //    我们取第一个（列表中的第一个元素），也就是最原始的客户端 IP
+        if (xf != null && !xf.isEmpty()) {
+            return xf.split(",")[0].trim();
+        }
+
+        // 3. 如果 “X-Forwarded-For” 头不存在或为空，则回退到 Servlet 提供的
+        //    req.getRemoteAddr()，它返回的是与服务器直接建立连接的那一端 IP，
+        //    在无代理或单层代理时即为真实客户端 IP。
+        return req.getRemoteAddr();
+    }
+
+
+
 
     /**
      * 用户注销
@@ -293,4 +321,5 @@ public class UserController {
         userService.changePassword(user.getId(), vo.getOldPassword(), vo.getNewPassword());
         return ResultUtils.success("ok");
     }
+
 }

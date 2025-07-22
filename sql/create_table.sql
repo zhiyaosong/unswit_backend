@@ -14,6 +14,7 @@ drop table if exists blog_comments;
 drop table if exists post_comments;
 drop table if exists user_blog_likes;
 drop table if exists user_post_likes;
+drop table if exists blacklist;
 drop table if exists blog;
 drop table if exists post;
 drop table if exists user;
@@ -90,6 +91,18 @@ create table if not exists user_note_likes
      FOREIGN KEY (userId) REFERENCES user(id),
      FOREIGN KEY (noteId) REFERENCES note(id)
 ) comment '用户笔记点赞表';
+
+-- 黑名单表，记录用户或 IP 被拉黑记录
+CREATE TABLE if not exists blacklist (
+       id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+       type       VARCHAR(10) NOT NULL,     -- 'USER' 或 'IP'
+       target     VARCHAR(64) NOT NULL,     -- userId 或 ip 字符串
+       reason     VARCHAR(255),
+       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+       UNIQUE KEY uk_type_target (type, target)
+);
+
+
 
 # 自动更新note.likeCount的触发器
 DELIMITER $$
