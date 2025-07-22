@@ -28,7 +28,7 @@ import java.util.Map;
 @Tag(name = "note接口", description = "notes增删改接口（查在course接口里）")
 @RestController
 @RequestMapping("/note")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","https://unswit.com"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.DELETE}, allowCredentials = "true")
 public class NoteController {
     @Resource
     private NoteService noteService;

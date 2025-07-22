@@ -1,4 +1,6 @@
+### deploy
 !**/src/resources/application-prod.yml
+/sql/insert_table_prod.sql
 
 HELP.md
 target/

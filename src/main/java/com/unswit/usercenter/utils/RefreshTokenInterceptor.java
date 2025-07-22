@@ -26,6 +26,10 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         // String token = request.getHeader("authorization");
         // 获取Cookie中的token
         Cookie[] cookies = request.getCookies();
+        // 预检请求直接放行
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
 
         if (cookies != null){
             for (Cookie cookie : cookies){

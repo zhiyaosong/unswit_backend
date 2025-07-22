@@ -39,7 +39,7 @@ import static com.unswit.usercenter.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.PUT}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","https://unswit.com"},methods = {RequestMethod.POST,RequestMethod.GET,RequestMethod.PUT}, allowCredentials = "true")
 public class UserController {
 
     @Resource

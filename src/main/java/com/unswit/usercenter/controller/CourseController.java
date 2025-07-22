@@ -19,7 +19,7 @@ import java.util.Map;
 @Tag(name = "Course接口", description = "主要返回course-notes列表")
 @RestController
 @RequestMapping("/course")
-@CrossOrigin(origins = {"http://localhost:8000","http://124.220.105.199"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8000","https://unswit.com"},methods = {RequestMethod.POST,RequestMethod.GET}, allowCredentials = "true")
 public class CourseController {
     @Resource
     private CourseService courseService;
