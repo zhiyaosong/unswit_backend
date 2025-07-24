@@ -43,7 +43,13 @@ public class PostCommentsServiceImpl extends ServiceImpl<PostCommentsMapper, Pos
         // 1. 查询并转换 post -> postDTO
         Post postEntity = postService.getById(postId);
         PostDetailsDTO postDto = BeanUtil.copyProperties(postEntity, PostDetailsDTO.class);
-
+        User u = userService.getById(postEntity.getUserId());
+        // 设置作者名和头像
+        String userName = (u != null && u.getUserName() != null) ? u.getUserName() : "编程侠";
+        String avatar = (u != null && u.getAvatarUrl() != null) ? u.getAvatarUrl() : "/img/a.png";
+        postDto.setAuthor(userName);
+        postDto.setAuthorAvatar(avatar);
+        
         if (postEntity.getImages() != null && !postEntity.getImages().trim().isEmpty()) {
             List<String> images = Arrays.stream(postEntity.getImages().split(" "))
                     .map(String::trim)
