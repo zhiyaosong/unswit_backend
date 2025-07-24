@@ -10,6 +10,16 @@ public class PostDetailsDTO {
     private Long id;
 
     /**
+     * 作者名
+     */
+    private String author;
+
+    /**
+     * 作者头像
+     */
+    private String authorAvatar;
+
+    /**
      * userId
      */
     private String userId;
